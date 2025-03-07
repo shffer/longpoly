@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Shane", "Fernandez", , "s.fernandez@ecu.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4881-245X"))
-Description: Functions to test, fit, and plot polynomial models to describe rates of change in longitudinal data as a function of mean performance. Floor effects in cognitive data an also be identified in a data-driven manner.
+Description: Functions to test, fit, and plot polynomial models to describe rates of change in longitudinal data as a function of mean performance. Floor effects in cognitive data can also be identified in a data-driven manner.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

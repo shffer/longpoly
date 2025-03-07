@@ -1,19 +1,34 @@
 #' Test models with polynomials of differing orders to describe the relationship between linear rate of change and mean score in longitudinal data
 #'
-#' @param data Output from `longpoly::get_slopes_and_mean()` (or any tibble with columns "id", "performance_slope", & "performance_mean")
-#' @param test_proportion The proportion of participants to allocate to the test set. Default = `2/3`
-#' @param max_order The maximum order for polynomial models to be tested. Polynomial models for 1:`max_order` will be tested. Default = `6`
+#' @param data output from `longpoly::get_slopes_and_mean()` (or any tibble with columns "id", "performance_slope", & "performance_mean")
+#' @param test_proportion the proportion of participants to allocate to the test set. default = `2/3`
+#' @param max_order the maximum order for polynomial models to be tested. Polynomial models for 1:`max_order` will be tested. default = `6`
 #'
 #' @return
-#' A list containing:
-#' 1. `polynomial_results` A tibble with columns recording the order of each polynomial tested with the corresponding PVE in test and train data, as well as the additional PVE in the test data for the increase in order for each
-#' 2. `train_ids` A character vector of ids allocated to the train dataset in model development
-#' 3. `test_ids` A character vector of ids allocated to the test dataset in model development
-#' 4. `scree_plot` A visualisation of the additional PVE for each polynomial. It is recommended that the order of the model be select as that to the left of the ‘elbow’ (where the improvement plateaus).
+#' a list containing:
+#' 1. `polynomial_results` — a tibble with columns recording the order of each polynomial tested with the corresponding proportion of variance explained (PVE) in test and train data, as well as the additional PVE in the test data for the increase in order for each
+#' 2. `train_ids`  — a character vector of ids allocated to the train dataset in model development
+#' 3. `test_ids`  — a character vector of ids allocated to the test dataset in model development
+#' 4. `scree_plot`  — a visualisation of the additional PVE for each polynomial. It is recommended that the order of the model be selected as that to the left of the ‘elbow’ (where the improvement plateaus).
 #' @export
 #'
 #' @examples
-#' #example()
+#'
+#' # test_polynomial(slope_mean_tibble,
+#' #                 test_proportion = 0.75,
+#' #                 max_order = 5)
+#' #
+#' # # alternatively, the output from longpoly::get_slopes_and_mean() may be directly piped in, e.g.:
+#' #
+#' # get_slopes_and_mean(example_data,
+#' #                     id_col = "id",
+#' #                     outcome_col = "memory_test",
+#' #                     time_col = "time") %>%
+#' #   test_polynomial(.,
+#' #                 test_proportion = 0.75,
+#' #                 max_order = 5)
+#'
+
 
 test_polynomial <-
   function(data,

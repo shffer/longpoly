@@ -1,33 +1,100 @@
+#' Plot selected models from longpoly::polynomial_results() tibble output from the implement_polynomial() function
+#'
+#' @param data the `final_data` tibble output from the `longpoly::implement_polynomial()`
+#' @param order the order of the polynomial model (recommended to be selected on the scree plot output from `longpoly::test_polynomial()`). default = `3`
+#' @param x_label a character vector to optionally change the x axis label. default = "Mean Performance"
+#' @param y_label a character vector to optionally change the y axis label. default = "Slope"
+#' @param line_width the width of the line reflecting the polynomial equation. default = `1.5`
+#' @param whole_cohort_point_color optionally set the color of the points in the whole cohort plot
+#' @param whole_cohort_line_color optionally set the color of the line in the whole cohort plot
+#' @param whole_cohort_title optionally set the title of the whole cohort plot. default = `NULL`
+#' @param whole_cohort_only should only the whole cohort plot be generated? if false, plots showing the train/test performance in `long_poly::test_polynomial()` for the selected order are returned. default = `TRUE`
+#' @param train_id a vector of containing the IDs of observations allocated to the training dataset (recommended to use `train_ids` output from long_poly::test_polynomial)
+#' @param test_id a vector of containing the IDs of observations allocated to the test dataset (recommended to use `test_ids` output from `long_poly::test_polynomial()`)
+#' @param train_point_color optionally set the color of the points in the training data plot
+#' @param train_line_color optionally set the color of the line in the training data plot
+#' @param train_title optionally set the color of the points in the training data plot. default = `NULL`
+#' @param test_point_color optionally set the color of the points in the test data plot
+#' @param test_line_color optionally set the color of the line in the test data plot
+#' @param test_title optionally set the title of the test data plot. default = `NULL`
+#' @param show_equation show the equation of the model in the plot? default = `TRUE`
+#' @param keep_remove produce an additional plot showing IDs removed due to floor effects? default = `FALSE`
+#' @param threshold (required if `keep_remove = TRUE`) the threshold used to keep or remove records due to floor_effects (recommended to use `threshold` output from `long_poly::implement_polynomial()`)
+#' @param threshold_linetype ggplot linetype arguments to control type of line when `keep_remove = TRUE`. set to "blank" to remove line
+#' @param threshold_line_color optionally set color of threhold line when `keep_remove = TRUE`
+#' @param x_offset increase or decrease the x axis plotting region. this value is subtracted and added from the min and max values of performance_mean, respectively, to specify the plotting region in relation to the observed data. default = 0.25
+#' @param y_offset increase or decrease the y axis plotting region. this value is subtracted and added from the min and max values of performance_slope, respectively, to specify the plotting region in relation to the observed data. default = 0.35
+#' @param remove_point_color optionally set the point color for removed participants due to floor effects when `keep_remove = TRUE` (those kept will be plotted with color specified in `whole_cohort_point_color`)
+#' @param annotate_floor_thresh include an annotation specifying the threshold for floor effects when `keep_remove = TRUE`
+#' @param legend_position ggplot legend position argument to control the placement of a legend identifying the participants kept and removed when `keep_remove = TRUE`. default = "none"
+#' @param legend_title if a legend position is set and `keep_remove = TRUE`, this controls the title of the legend. deault = "Floor Effects"
+#' @param floor_keep_label if a legend position is set and `keep_remove = TRUE`, this controls the label of records with scores above the identified floor effects threshold. default = "Keep"
+#' @param floor_remove_label if a legend position is set and `keep_remove = TRUE`, this controls the label of records with scores below the identified floor effects threshold. default = "Remove"
+#'
+#' @return
+#' a list of ggplot objects:
+#' 1. `whole_cohort` — the selected polynomial applied to all records
+#' 2. `train` — (if requested) the selected polynomial applied to train data
+#' 2. `test` — (if requested) the selected polynomial applied to test data. note that the polynomial developed in the train data is applied to the test data
+#' 3. `keep_remove`  — (if requested) the whole_cohort plot with additional visualisation for the removal of records due to floor effects
+#' @export
+#'
+#' @examples
+#'
+#' # if implement_polynomial results were output to polynomial_data, plots can be produced as follows
+#'
+#' #' # plots <-
+#' #   plot_polynomials(
+#' #     data = polynomial_data$final_data,
+#' #     order = 3,
+#' #     whole_cohort_title = "Selected Polynomial in Whole Cohort",
+#' #     whole_cohort_only = FALSE,
+#' #     train_id = results$train_ids,
+#' #     test_id = results$test_ids,
+#' #     train_title = "Selected Polynomial in Train Cohort",
+#' #     test_title = "Selected Polynomial in Test Cohort",
+#' #     keep_remove = TRUE,
+#' #     threshold = polynomial_data$threshold,
+#' #     threshold_linetype = "dashed",
+#' #     threshold_line_color = "#5f6a7a",
+#' #     annotate_floor_thresh = TRUE,
+#' #     legend_position = "bottom"
+#' #   )
+#'
+#' # plots
+#'
+
 plot_polynomial <- function(data,
-                             x_label = "Mean Performance",
-                             y_label = "Slope",
-                             order = 3,
-                             point_size = 1.5,
-                             whole_cohort_point_color  = "#325a9c",
-                             whole_cohort_line_color = "#110036",
-                             whole_cohort_title = NULL,
-                             whole_cohort_only = TRUE,
-                             train_id = NULL,
-                             test_id = NULL,
-                             train_point_color = "#430C33",
-                             train_line_color = "#7B115B",
-                             train_title = NULL,
-                             test_point_color = "#113B19",
-                             test_line_color = "#7B115B",
-                             test_title = NULL,
-                             show_equation = TRUE,
-                             keep_remove = TRUE,
-                             threshold = NULL,
-                             threshold_linetype = "dashed",
-                             threshold_line_color = "#5f6a7a",
-                             x_offset = 0.25,
-                             y_offset = 0.35,
-                             remove_point_color = "grey",
-                             annotate_floor_thresh = FALSE,
-                             legend_position = "none",
-                             legend_title = "Floor Effects",
-                             floor_keep_label = "Keep",
-                             floor_remove_label = "Remove") {
+                            order = 3,
+                            x_label = "Mean Performance",
+                            y_label = "Slope",
+                            line_size = 1.5,
+                            whole_cohort_point_color  = "#325a9c",
+                            whole_cohort_line_color = "#110036",
+                            whole_cohort_title = NULL,
+                            whole_cohort_only = TRUE,
+                            train_id = NULL,
+                            test_id = NULL,
+                            train_point_color = "#430C33",
+                            train_line_color = "#7B115B",
+                            train_title = NULL,
+                            test_point_color = "#113B19",
+                            test_line_color = "#7B115B",
+                            test_title = NULL,
+                            show_equation = TRUE,
+                            keep_remove = FALSE,
+                            threshold = NULL,
+                            threshold_linetype = "dashed",
+                            threshold_line_color = "#5f6a7a",
+                            x_offset = 0.25,
+                            y_offset = 0.35,
+                            remove_point_color = "grey",
+                            annotate_floor_thresh = FALSE,
+                            legend_position = "none",
+                            legend_title = "Floor Effects",
+                            floor_keep_label = "Keep",
+                            floor_remove_label = "Remove") {
+
   # ensure 'floor_effects' is properly assigned as a factor in the tibble
   data <- data %>%
     mutate(floor_effects = factor(floor_effects, levels = unique(floor_effects)))
@@ -58,7 +125,7 @@ plot_polynomial <- function(data,
     ) +
     stat_function(fun = poly_fun,
                   color = whole_cohort_line_color,
-                  linewidth = point_size) +
+                  linewidth = line_width) +
     xlab(x_label) +
     ylab(y_label) +
     ylim(min(data$performance_slope) - y_offset,
