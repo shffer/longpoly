@@ -28,6 +28,6 @@ Get individual linear slope and mean values from longitudinal data
 }
 \examples{
 
-get_slopes_and_mean(example_data, id_col = "id", outcome_col = "memory_test", time_col = "time")
+# get_slopes_and_mean(example_data, id_col = "id", outcome_col = "memory_test", time_col = "time")
 
 }

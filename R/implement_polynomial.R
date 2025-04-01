@@ -12,13 +12,15 @@
 #' 3. `threshold` — if `floor_effects = TRUE`, this records the threshold used for floor effect classifications
 #'
 #' @export
-#'
+#' @import magrittr
 #' @examples
 #'
 #' # implement_polynomial(example_slope_mean_data,
 #' #                      floor_effects = FALSE)
 #' #
-#' # # if floor_effects = TRUE, it may be sensible to use the minumum performance_mean value as the lower bound of the range, e.g.:
+#' # # if floor_effects = TRUE,
+#' # it may be sensible to use the minumum performance_mean value as the lower bound of the range,
+#' # e.g.:
 #' # example_slope_mean_data <-
 #' #   longpoly::get_slopes_and_mean(
 #' #     example_data,
@@ -37,7 +39,9 @@
 #' # )
 #' #
 #' #
-#' # # if floor_effects = FALSE, it is straightforward to pipe in the output from longpoly::get_slopes_and_mean(), e.g.:
+#' # # if floor_effects = FALSE,
+#' # it is straightforward to pipe in the output from longpoly::get_slopes_and_mean(),
+#' # e.g.:
 #' # get_slopes_and_mean(example_data,
 #' #                    id_col = "id",
 #' #                    outcome_col = "memory_test",
@@ -45,66 +49,60 @@
 #' #   implement_polynomial(., floor_effects = FALSE)
 #'
 
-implement_polynomial <-
-  function(data,
-           order = 3,
-           floor_effects = FALSE,
-           floor_range = NULL) {
+implement_polynomial <- function(data, order = 3, floor_effects = FALSE, floor_range = NULL) {
 
-    # column names as expected from get_slopes_and_mean() output
-    outcome <- "performance_slope"
-    predictor <- "performance_mean"
+  outcome <- "performance_slope"
+  predictor <- "performance_mean"
 
-    # fit model
-    formula <-
-      as.formula(paste(outcome, "~ poly(", predictor, ",", order, ", raw=TRUE)"))
-    model <- lm(formula, data = data)
+  formula <- as.formula(paste(outcome, "~ poly(", predictor, ",", order, ", raw=TRUE)"))
+  model <- lm(formula, data = data)
 
-    # generate predictions and residuals
-    data$predicted_slope <- predict(model, newdata = data)
-    data$residual <- data[[outcome]] - data$predicted_slope
+  data$predicted_slope <- predict(model, newdata = data)
+  data$residual <- data[[outcome]] - data$predicted_slope
 
-    # handle floor effects if requested
-    threshold <- NA
-    if (floor_effects) {
-      if (is.null(floor_range) || length(floor_range) != 2) {
-        stop(
-          "floor_range must be provided as a numeric vector of length 2 when floor_effects is TRUE."
-        )
-      }
-
-      # subset data within the specified range
-      floor_subset <- data %>%
-        filter(between(.data[[predictor]], floor_range[1], floor_range[2]))
-
-      if (nrow(floor_subset) == 0) {
-        message("No values found in the specified floor_range. No floor effects applied.")
-        data$floor_effects <- "keep"
-      } else {
-        # find the threshold value where the minimum slope occurs within the range
-        min_slope_row <- floor_subset %>%
-          filter(.data[[outcome]] == min(.data[[outcome]], na.rm = TRUE))
-
-        if (nrow(min_slope_row) == 0) {
-          message("No minimum found within the specified range. No floor effects applied.")
-          data$floor_effects <- "keep"
-        } else {
-          threshold <- min_slope_row[[predictor]][1]
-          data <- data %>%
-            mutate(floor_effects = ifelse(.data[[predictor]] < threshold, "remove", "keep"))
-        }
-      }
-    } else {
-      data$floor_effects <- "keep"
+  threshold <- NA
+  if (floor_effects) {
+    if (is.null(floor_range) || length(floor_range) != 2) {
+      stop("floor_range must be a numeric vector of length 2 when floor_effects is TRUE.")
     }
 
-    data <- data %>%
-      mutate(floor_effects = factor(floor_effects, levels = c("keep", "remove")))
+    coefs <- coef(model)
+    deriv_coefs <- coefs[2:(order + 1)] * (1:order)
+    critical_points <- polyroot(deriv_coefs)
+    real_critical_points <- Re(critical_points[abs(Im(critical_points)) < 1e-10])
 
-    # return results
-    return(list(
-      model_formula = formula,
-      final_data = data,
-      threshold = threshold
-    ))
+    # compute second derivative
+    second_deriv_coefs <- deriv_coefs[2:length(deriv_coefs)] * (2:length(deriv_coefs))
+
+    # evaluate second derivative at critical points
+    is_minimum <- sapply(real_critical_points, function(x) {
+      sum(second_deriv_coefs * x^(0:(length(second_deriv_coefs) - 1))) > 0
+    })
+
+    valid_critical_points <- real_critical_points[
+      is_minimum &
+        real_critical_points >= min(floor_range) &
+        real_critical_points <= max(floor_range)
+    ]
+
+    if (length(valid_critical_points) == 0) {
+      message("No valid minimum found within the specified floor_range. No floor effects applied.")
+      data$floor_effects <- "keep"
+    } else {
+      threshold <- valid_critical_points[1]
+      data <- data %>%
+        mutate(floor_effects = ifelse(.data[[predictor]] < threshold, "remove", "keep"))
+    }
+  } else {
+    data$floor_effects <- "keep"
   }
+
+  data <- data %>%
+    mutate(floor_effects = factor(floor_effects, levels = c("keep", "remove")))
+
+  return(list(
+    model_formula = formula,
+    final_data = data,
+    threshold = threshold
+  ))
+}

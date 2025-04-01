@@ -2,14 +2,14 @@
 % Please edit documentation in R/plot_polynomial.R
 \name{plot_polynomial}
 \alias{plot_polynomial}
-\title{Plot selected models from longpoly::polynomial_results() tibble output from the implement_polynomial() function}
+\title{Plot selected models from \code{final_data} tibble output from the \code{longpoly::implement_polynomial()} function}
 \usage{
 plot_polynomial(
   data,
   order = 3,
   x_label = "Mean Performance",
   y_label = "Slope",
-  line_size = 1.5,
+  line_width = 1.5,
   whole_cohort_point_color = "#325a9c",
   whole_cohort_line_color = "#110036",
   whole_cohort_title = NULL,
@@ -46,15 +46,17 @@ plot_polynomial(
 
 \item{y_label}{a character vector to optionally change the y axis label. default = "Slope"}
 
+\item{line_width}{the width of the line reflecting the polynomial equation. default = \code{1.5}}
+
 \item{whole_cohort_point_color}{optionally set the color of the points in the whole cohort plot}
 
 \item{whole_cohort_line_color}{optionally set the color of the line in the whole cohort plot}
 
 \item{whole_cohort_title}{optionally set the title of the whole cohort plot. default = \code{NULL}}
 
-\item{whole_cohort_only}{should only the whole cohort plot be generated? if false, plots showing the train/test performance in \code{long_poly::test_polynomial()} for the selected order are returned. default = \code{TRUE}}
+\item{whole_cohort_only}{should only the whole cohort plot be generated? if \code{FALSE}, plots showing the train/test performance in \code{long_poly::test_polynomial()} for the selected order are returned. default = \code{TRUE}}
 
-\item{train_id}{a vector of containing the IDs of observations allocated to the training dataset (recommended to use \code{train_ids} output from long_poly::test_polynomial)}
+\item{train_id}{a vector of containing the IDs of observations allocated to the training dataset (recommended to use \code{train_ids} output from \code{long_poly::test_polynomial()})}
 
 \item{test_id}{a vector of containing the IDs of observations allocated to the test dataset (recommended to use \code{test_ids} output from \code{long_poly::test_polynomial()})}
 
@@ -62,7 +64,7 @@ plot_polynomial(
 
 \item{train_line_color}{optionally set the color of the line in the training data plot}
 
-\item{train_title}{optionally set the color of the points in the training data plot. default = \code{NULL}}
+\item{train_title}{optionally set the title of the the training data plot. default = \code{NULL}}
 
 \item{test_point_color}{optionally set the color of the points in the test data plot}
 
@@ -70,7 +72,7 @@ plot_polynomial(
 
 \item{test_title}{optionally set the title of the test data plot. default = \code{NULL}}
 
-\item{show_equation}{show the equation of the model in the plot? default = \code{TRUE}}
+\item{show_equation}{show the equation of the model in the plots? default = \code{TRUE}}
 
 \item{keep_remove}{produce an additional plot showing IDs removed due to floor effects? default = \code{FALSE}}
 
@@ -95,8 +97,6 @@ plot_polynomial(
 \item{floor_keep_label}{if a legend position is set and \code{keep_remove = TRUE}, this controls the label of records with scores above the identified floor effects threshold. default = "Keep"}
 
 \item{floor_remove_label}{if a legend position is set and \code{keep_remove = TRUE}, this controls the label of records with scores below the identified floor effects threshold. default = "Remove"}
-
-\item{line_width}{the width of the line reflecting the polynomial equation. default = \code{1.5}}
 }
 \value{
 a list of ggplot objects:
@@ -108,7 +108,7 @@ a list of ggplot objects:
 }
 }
 \description{
-Plot selected models from longpoly::polynomial_results() tibble output from the implement_polynomial() function
+Plot selected models from \code{final_data} tibble output from the \code{longpoly::implement_polynomial()} function
 }
 \examples{
 

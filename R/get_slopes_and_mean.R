@@ -7,10 +7,11 @@
 #'
 #' @return a `tibble` with `id`, `performance_slope`, and `performance_mean` columns. This is what is used as inputs for subsequent `test_polynomial()` and `implement_polynomial()` function calls (and can therefore be directly piped in without storing intermediate output)
 #' @export
-#'
+#' @import magrittr
+#' @import dplyr
 #' @examples
 #'
-#' get_slopes_and_mean(example_data, id_col = "id", outcome_col = "memory_test", time_col = "time")
+#' # get_slopes_and_mean(example_data, id_col = "id", outcome_col = "memory_test", time_col = "time")
 #'
 
 get_slopes_and_mean <-
@@ -22,9 +23,9 @@ get_slopes_and_mean <-
       group_by(across(all_of(id_col))) %>%
       summarise(
         performance_slope = coef(lm(
-          reformulate(time, outcome), data = pick(everything())
+          reformulate(time_col, outcome_col), data = pick(everything())
         ))[2],
-        performance_mean = mean(.data[[outcome]], na.rm = TRUE),
+        performance_mean = mean(.data[[outcome_col]], na.rm = TRUE),
         .groups = "drop"
       )
   }

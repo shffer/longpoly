@@ -36,7 +36,9 @@ Fit a polynomial of a specified order to describe the relationship between linea
 # implement_polynomial(example_slope_mean_data,
 #                      floor_effects = FALSE)
 #
-# # if floor_effects = TRUE, it may be sensible to use the minumum performance_mean value as the lower bound of the range, e.g.:
+# # if floor_effects = TRUE,
+# it may be sensible to use the minumum performance_mean value as the lower bound of the range,
+# e.g.:
 # example_slope_mean_data <-
 #   longpoly::get_slopes_and_mean(
 #     example_data,
@@ -55,7 +57,9 @@ Fit a polynomial of a specified order to describe the relationship between linea
 # )
 #
 #
-# # if floor_effects = FALSE, it is straightforward to pipe in the output from longpoly::get_slopes_and_mean(), e.g.:
+# # if floor_effects = FALSE,
+# it is straightforward to pipe in the output from longpoly::get_slopes_and_mean(),
+# e.g.:
 # get_slopes_and_mean(example_data,
 #                    id_col = "id",
 #                    outcome_col = "memory_test",

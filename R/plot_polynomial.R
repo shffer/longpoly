@@ -1,4 +1,4 @@
-#' Plot selected models from longpoly::polynomial_results() tibble output from the implement_polynomial() function
+#' Plot selected models from `final_data` tibble output from the `longpoly::implement_polynomial()` function
 #'
 #' @param data the `final_data` tibble output from the `longpoly::implement_polynomial()`
 #' @param order the order of the polynomial model (recommended to be selected on the scree plot output from `longpoly::test_polynomial()`). default = `3`
@@ -8,16 +8,16 @@
 #' @param whole_cohort_point_color optionally set the color of the points in the whole cohort plot
 #' @param whole_cohort_line_color optionally set the color of the line in the whole cohort plot
 #' @param whole_cohort_title optionally set the title of the whole cohort plot. default = `NULL`
-#' @param whole_cohort_only should only the whole cohort plot be generated? if false, plots showing the train/test performance in `long_poly::test_polynomial()` for the selected order are returned. default = `TRUE`
-#' @param train_id a vector of containing the IDs of observations allocated to the training dataset (recommended to use `train_ids` output from long_poly::test_polynomial)
+#' @param whole_cohort_only should only the whole cohort plot be generated? if `FALSE`, plots showing the train/test performance in `long_poly::test_polynomial()` for the selected order are returned. default = `TRUE`
+#' @param train_id a vector of containing the IDs of observations allocated to the training dataset (recommended to use `train_ids` output from `long_poly::test_polynomial()`)
 #' @param test_id a vector of containing the IDs of observations allocated to the test dataset (recommended to use `test_ids` output from `long_poly::test_polynomial()`)
 #' @param train_point_color optionally set the color of the points in the training data plot
 #' @param train_line_color optionally set the color of the line in the training data plot
-#' @param train_title optionally set the color of the points in the training data plot. default = `NULL`
+#' @param train_title optionally set the title of the the training data plot. default = `NULL`
 #' @param test_point_color optionally set the color of the points in the test data plot
 #' @param test_line_color optionally set the color of the line in the test data plot
 #' @param test_title optionally set the title of the test data plot. default = `NULL`
-#' @param show_equation show the equation of the model in the plot? default = `TRUE`
+#' @param show_equation show the equation of the model in the plots? default = `TRUE`
 #' @param keep_remove produce an additional plot showing IDs removed due to floor effects? default = `FALSE`
 #' @param threshold (required if `keep_remove = TRUE`) the threshold used to keep or remove records due to floor_effects (recommended to use `threshold` output from `long_poly::implement_polynomial()`)
 #' @param threshold_linetype ggplot linetype arguments to control type of line when `keep_remove = TRUE`. set to "blank" to remove line
@@ -38,7 +38,9 @@
 #' 2. `test` — (if requested) the selected polynomial applied to test data. note that the polynomial developed in the train data is applied to the test data
 #' 3. `keep_remove`  — (if requested) the whole_cohort plot with additional visualisation for the removal of records due to floor effects
 #' @export
-#'
+#' @import magrittr
+#' @import ggplot2
+#' @importFrom ggpubr ggscatter
 #' @examples
 #'
 #' # if implement_polynomial results were output to polynomial_data, plots can be produced as follows
@@ -68,7 +70,7 @@ plot_polynomial <- function(data,
                             order = 3,
                             x_label = "Mean Performance",
                             y_label = "Slope",
-                            line_size = 1.5,
+                            line_width = 1.5,
                             whole_cohort_point_color  = "#325a9c",
                             whole_cohort_line_color = "#110036",
                             whole_cohort_title = NULL,

@@ -11,7 +11,7 @@
 #' 3. `test_ids`  — a character vector of ids allocated to the test dataset in model development
 #' 4. `scree_plot`  — a visualisation of the additional PVE for each polynomial. It is recommended that the order of the model be selected as that to the left of the ‘elbow’ (where the improvement plateaus).
 #' @export
-#'
+#' @import magrittr
 #' @examples
 #'
 #' # test_polynomial(slope_mean_tibble,
