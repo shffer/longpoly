@@ -5,6 +5,7 @@
 #' @param x_label a character vector to optionally change the x axis label. default = "Mean Performance"
 #' @param y_label a character vector to optionally change the y axis label. default = "Slope"
 #' @param line_width the width of the line reflecting the polynomial equation. default = `1.5`
+#' @param point_size the size of the individual data points. default = `3.5`
 #' @param whole_cohort_point_color optionally set the color of the points in the whole cohort plot
 #' @param whole_cohort_line_color optionally set the color of the line in the whole cohort plot
 #' @param whole_cohort_title optionally set the title of the whole cohort plot. default = `NULL`
@@ -24,10 +25,14 @@
 #' @param threshold_line_color optionally set color of threhold line when `keep_remove = TRUE`
 #' @param x_offset increase or decrease the x axis plotting region. this value is subtracted and added from the min and max values of performance_mean, respectively, to specify the plotting region in relation to the observed data. default = 0.25
 #' @param y_offset increase or decrease the y axis plotting region. this value is subtracted and added from the min and max values of performance_slope, respectively, to specify the plotting region in relation to the observed data. default = 0.35
+#' @param title_text_size ggplot title text size argument. default = `14`
+#' @param axis_text_size ggplot axis title text size argument. default = `12`
 #' @param remove_point_color optionally set the point color for removed participants due to floor effects when `keep_remove = TRUE` (those kept will be plotted with color specified in `whole_cohort_point_color`)
 #' @param annotate_floor_thresh include an annotation specifying the threshold for floor effects when `keep_remove = TRUE`
 #' @param legend_position ggplot legend position argument to control the placement of a legend identifying the participants kept and removed when `keep_remove = TRUE`. default = "none"
-#' @param legend_title if a legend position is set and `keep_remove = TRUE`, this controls the title of the legend. deault = "Floor Effects"
+#' @param legend_title if a legend position is set and `keep_remove = TRUE`, this controls the title of the legend. default = "Floor Effects"
+#' @param legend_title_size if a legend position is set and `keep_remove = TRUE`, this controls the size of the legend title (ggplot argument). default = 10
+#' @param legend_text_size if a legend position is set and `keep_remove = TRUE`, this controls the title of the legend text (ggplot argument). deafult = 10
 #' @param floor_keep_label if a legend position is set and `keep_remove = TRUE`, this controls the label of records with scores above the identified floor effects threshold. default = "Keep"
 #' @param floor_remove_label if a legend position is set and `keep_remove = TRUE`, this controls the label of records with scores below the identified floor effects threshold. default = "Remove"
 #'
@@ -71,6 +76,7 @@ plot_polynomial <- function(data,
                             x_label = "Mean Performance",
                             y_label = "Slope",
                             line_width = 1.5,
+                            point_size = 3.5,
                             whole_cohort_point_color  = "#325a9c",
                             whole_cohort_line_color = "#110036",
                             whole_cohort_title = NULL,
@@ -90,10 +96,14 @@ plot_polynomial <- function(data,
                             threshold_line_color = "#5f6a7a",
                             x_offset = 0.25,
                             y_offset = 0.35,
+                            title_text_size = 14,
+                            axis_text_size = 12,
                             remove_point_color = "grey",
                             annotate_floor_thresh = FALSE,
                             legend_position = "none",
                             legend_title = "Floor Effects",
+                            legend_title_size = 10,
+                            legend_text_size = 10,
                             floor_keep_label = "Keep",
                             floor_remove_label = "Remove") {
 
@@ -122,6 +132,7 @@ plot_polynomial <- function(data,
       data,
       x = "performance_mean",
       y = "performance_slope",
+      size = point_size,
       color = whole_cohort_point_color,
       title = whole_cohort_title
     ) +
@@ -134,7 +145,8 @@ plot_polynomial <- function(data,
          max(data$performance_slope) + y_offset) +
     xlim(min(data$performance_mean) - x_offset,
          max(data$performance_mean) + x_offset) +
-    theme(plot.title = element_text(hjust = 0.5))
+    theme(plot.title = element_text(hjust = 0.5, size = title_text_size),
+          axis.title = element_text(size = axis_text_size))
   # add equation if show_equation = TRUE
   if (show_equation) {
     whole_cohort <- whole_cohort +
@@ -188,18 +200,20 @@ plot_polynomial <- function(data,
         x = "performance_mean",
         y = "performance_slope",
         color = train_point_color,
-        title = train_title
+        title = train_title,
+        size = point_size
       ) +
       stat_function(fun = poly_fun_train,
                     color = train_line_color,
-                    linewidth = point_size) +
+                    linewidth = line_width) +
       xlab(x_label) +
       ylab(y_label) +
       ylim(min(data$performance_slope) - y_offset,
            max(data$performance_slope) + y_offset) +
       xlim(min(data$performance_mean) - x_offset,
            max(data$performance_mean) + x_offset) +
-      theme(plot.title = element_text(hjust = 0.5))
+      theme(plot.title = element_text(hjust = 0.5, size = title_text_size),
+            axis.title = element_text(size = axis_text_size))
 
     # test plot (note this uses the model from the train data)
     test_plot <-
@@ -208,18 +222,20 @@ plot_polynomial <- function(data,
         x = "performance_mean",
         y = "performance_slope",
         color = test_point_color,
-        title = test_title
+        title = test_title,
+        size = point_size
       ) +
       stat_function(fun = poly_fun_train,
                     color = test_line_color,
-                    linewidth = point_size) +
+                    linewidth = line_width) +
       xlab(x_label) +
       ylab(y_label) +
       ylim(min(data$performance_slope) - y_offset,
            max(data$performance_slope) + y_offset) +
       xlim(min(data$performance_mean) - x_offset,
            max(data$performance_mean) + x_offset) +
-      theme(plot.title = element_text(hjust = 0.5))
+      theme(plot.title = element_text(hjust = 0.5, size = title_text_size),
+            axis.title = element_text(size = axis_text_size))
 
     # position the equation equally in both plots
     if (show_equation) {
@@ -261,7 +277,7 @@ plot_polynomial <- function(data,
     }
 
     keep_remove_plot <- whole_cohort +
-      geom_point(aes(color = floor_effects), size = 2) +
+      geom_point(aes(color = floor_effects), size = point_size) +
       geom_vline(xintercept = threshold,
                  linetype = threshold_linetype,
                  color = threshold_line_color) +
@@ -271,8 +287,10 @@ plot_polynomial <- function(data,
       ) +
       stat_function(fun = poly_fun,
                     color = whole_cohort_line_color,
-                    linewidth = point_size) +
-      theme(legend.position = legend_position)  #
+                    linewidth = line_width) +
+      theme(legend.position = legend_position,
+            legend.title = element_text(size = legend_title_size),
+            legend.text = element_text(size = legend_text_size))
 
     # add legend title if requested
     if (!is.null(legend_title)) {

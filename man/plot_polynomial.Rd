@@ -10,6 +10,7 @@ plot_polynomial(
   x_label = "Mean Performance",
   y_label = "Slope",
   line_width = 1.5,
+  point_size = 3.5,
   whole_cohort_point_color = "#325a9c",
   whole_cohort_line_color = "#110036",
   whole_cohort_title = NULL,
@@ -29,10 +30,14 @@ plot_polynomial(
   threshold_line_color = "#5f6a7a",
   x_offset = 0.25,
   y_offset = 0.35,
+  title_text_size = 14,
+  axis_text_size = 12,
   remove_point_color = "grey",
   annotate_floor_thresh = FALSE,
   legend_position = "none",
   legend_title = "Floor Effects",
+  legend_title_size = 10,
+  legend_text_size = 10,
   floor_keep_label = "Keep",
   floor_remove_label = "Remove"
 )
@@ -47,6 +52,8 @@ plot_polynomial(
 \item{y_label}{a character vector to optionally change the y axis label. default = "Slope"}
 
 \item{line_width}{the width of the line reflecting the polynomial equation. default = \code{1.5}}
+
+\item{point_size}{the size of the individual data points. default = \code{3.5}}
 
 \item{whole_cohort_point_color}{optionally set the color of the points in the whole cohort plot}
 
@@ -86,13 +93,21 @@ plot_polynomial(
 
 \item{y_offset}{increase or decrease the y axis plotting region. this value is subtracted and added from the min and max values of performance_slope, respectively, to specify the plotting region in relation to the observed data. default = 0.35}
 
+\item{title_text_size}{ggplot title text size argument. default = \code{14}}
+
+\item{axis_text_size}{ggplot axis title text size argument. default = \code{12}}
+
 \item{remove_point_color}{optionally set the point color for removed participants due to floor effects when \code{keep_remove = TRUE} (those kept will be plotted with color specified in \code{whole_cohort_point_color})}
 
 \item{annotate_floor_thresh}{include an annotation specifying the threshold for floor effects when \code{keep_remove = TRUE}}
 
 \item{legend_position}{ggplot legend position argument to control the placement of a legend identifying the participants kept and removed when \code{keep_remove = TRUE}. default = "none"}
 
-\item{legend_title}{if a legend position is set and \code{keep_remove = TRUE}, this controls the title of the legend. deault = "Floor Effects"}
+\item{legend_title}{if a legend position is set and \code{keep_remove = TRUE}, this controls the title of the legend. default = "Floor Effects"}
+
+\item{legend_title_size}{if a legend position is set and \code{keep_remove = TRUE}, this controls the size of the legend title (ggplot argument). default = 10}
+
+\item{legend_text_size}{if a legend position is set and \code{keep_remove = TRUE}, this controls the title of the legend text (ggplot argument). deafult = 10}
 
 \item{floor_keep_label}{if a legend position is set and \code{keep_remove = TRUE}, this controls the label of records with scores above the identified floor effects threshold. default = "Keep"}
 
