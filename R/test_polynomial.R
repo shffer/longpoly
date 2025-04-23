@@ -35,7 +35,7 @@ test_polynomial <-
            test_proportion = 2 / 3,
            max_order = 6) {
     library(ggplot2)
-    set.seed(2244)
+
     idcol = "id"
     # column names as expected from get_slopes_and_mean() output
     outcome <- "performance_slope"
