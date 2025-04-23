@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# longpoly <a href="https://dplyr.tidyverse.org"><img src="man/figures/longpoly_logo.png" align="right" height="138" /></a>
+# longpoly <a href="https://dplyr.tidyverse.org"><img src="man/figures/longpoly_logo.png" align="right" height="200" /></a>
 
 <!-- badges: start -->
 <!-- badges: end -->
