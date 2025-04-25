@@ -1,7 +1,7 @@
 #' Test models with polynomials of differing orders to describe the relationship between linear rate of change and mean score in longitudinal data
 #'
 #' @param data output from `longpoly::get_slopes_and_mean()` (or any tibble with columns "id", "performance_slope", & "performance_mean")
-#' @param test_proportion the proportion of participants to allocate to the test set. default = `2/3`
+#' @param test_proportion the proportion of participants to allocate to the test set. default = `1/3`
 #' @param max_order the maximum order for polynomial models to be tested. Polynomial models for 1:`max_order` will be tested. default = `6`
 #'
 #' @return
@@ -32,7 +32,7 @@
 
 test_polynomial <-
   function(data,
-           test_proportion = 2 / 3,
+           test_proportion = 1 / 3,
            max_order = 6) {
     library(ggplot2)
 

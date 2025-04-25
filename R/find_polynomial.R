@@ -1,16 +1,21 @@
 #' Title
 #'
-#' @param data
-#' @param test_proportion
-#' @param idcol
-#' @param max_order
-#' @param x
+#' @param data output from `longpoly::get_slopes_and_mean()` (or any tibble with columns "id", "performance_slope", & "performance_mean")
+#' @param test_proportion the proportion of participants to allocate to the test set. default = `1/3`
+#' @param idcol the column name corresponding to the ID variable in data. Default = `"id"`
+#' @param max_order the maximum order for polynomial models to be tested. Polynomial models for 1:`max_order` will be tested. default = `6`
+#' @param x Polynomials are selected after finding the maximum proportion of variance explained (PVE) in test data across all models, and then finding the most parsimonious model with a PVE that is at least max(PVE) - x
 #'
-#' @return
+#' @return a list containing:
+#' 1. 'polynomial_results' - a tibble with columns for the order of the model tested and the corresponding pve in the train and test data
+#' 2. 'selected_order' - the order of the selected model (based on the max(PVE) - x criteria)
+#' 3. 'selected_model_coefficients' - coefficients of the selected model (based on the max(PVE) - x criteria)
+#' 4. 'train_ids' — a character vector of ids allocated to the train dataset in model development
+#' 5. 'test_ids' — a character vector of ids allocated to the test dataset in model development
 #' @export
 #'
 #' @examples
-find_polynomial <- function(data, test_proportion, idcol, max_order, x) {
+#find_polynomial <- function(data, test_proportion = 1/3, idcol = "id", max_order = 6, x) {
 
 
   # Column names
@@ -81,12 +86,8 @@ find_polynomial <- function(data, test_proportion, idcol, max_order, x) {
   return(list(
     polynomial_results = polynomial_results,
     selected_order = selected_order,
-    selected_model = selected_model,
-    selected_formula = final_formula,
-    final_model_coefficients = final_coefficients,
+    selected_model_coefficients = final_coefficients,
     train_ids = train_ids,
-    train_data = train,
     test_ids = test_ids,
-    test_data = test
   ))
 }
