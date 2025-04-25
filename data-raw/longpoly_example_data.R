@@ -3,7 +3,7 @@
 usethis::use_data(longpoly_example_data, overwrite = TRUE)
 
 # SIMULATE DATA ----
-set.seed(4444)
+set.seed(22222)
 
 ## Parameters ----
 cu_participants <- 1000
@@ -36,4 +36,4 @@ longpoly_example_data <-
          performance_mean = performance) |>
   mutate(performance_slope = sapply(performance_mean, assign_slope))
 
-usethis::use_data(longpoly_example_data)
+usethis::use_data(longpoly_example_data, overwrite = TRUE)
