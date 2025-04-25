@@ -122,11 +122,11 @@ unimpaired participants) and another 1000 mean values were then sampled
 from $N(-1.5, 0.75)$ (participants with cognitive impairment). The data
 were combined and slopes ($Y$) were assigned conditionally as follows:
 
-- $Y \sim N(-0.10, 0.2)$ if $-0.5 \le \bar{X}$
-- $Y \sim N(-0.30, 0.2)$ if $-1.0 \le \bar{X} < -0.5$
-- $Y \sim N(-0.45, 0.2)$ if $-1.5 \le \bar{X} < -1$
-- $Y \sim N(-0.25, 0.2)$ if $-2.0 \le \bar{X} < -1.5$
-- $Y \sim N(-0.15, 0.2)$ if     $\bar{X} < -2$
+- $Y \sim N(-0.10, 0.2)$  if  $-0.5 \le \bar{X}$
+- $Y \sim N(-0.30, 0.2)$  if  $-1.0 \le \bar{X} < -0.5$
+- $Y \sim N(-0.45, 0.2)$  if  $-1.5 \le \bar{X} < -1$
+- $Y \sim N(-0.25, 0.2)$  if  $-2.0 \le \bar{X} < -1.5$
+- $Y \sim N(-0.15, 0.2)$  if      $\bar{X} < -2$
 
 Given this, a non-linear relationship is expected where minimal decline
 is expected when mean performance is above -0.5. For those with lower
