@@ -30,3 +30,6 @@ a list containing:
 \description{
 Title
 }
+\examples{
+# example
+}

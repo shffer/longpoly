@@ -13,4 +13,6 @@ Depends:
     magrittr,
     dplyr,
     ggplot2,
-    ggpubr
+    ggpubr,
+    R (>= 3.5)
+LazyData: true
