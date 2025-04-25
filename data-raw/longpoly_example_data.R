@@ -3,13 +3,12 @@
 usethis::use_data(longpoly_example_data, overwrite = TRUE)
 
 # SIMULATE DATA ----
-set.seed(22222)
+set.seed(1111)
 
 ## Parameters ----
 cu_participants <- 1000
 dx_participants <- 1000
-n_timepoints <- 3
-timepoints <- c(0, 12, 24, 36, 48)
+
 
 # Generate mean performance values
 performance <- append(rnorm(cu_participants, mean = 0, sd = 1),

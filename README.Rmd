@@ -84,12 +84,12 @@ The dummy data used for `get_slopes_and_mean()` did not simulate any relationshi
 - $Y \sim N(-0.25, 0.2)$  if  $-2.0 \le \bar{X} < -1.5$
 - $Y \sim N(-0.15, 0.2)$  if     $\bar{X} < -2$
 
-Given this, a non-linear relationship is expected where minimal decline is expected when mean performance is above -0.5. For those with lower mean performance, faster decline is expected until mean performance reaches -1.5 at which point decline slows again. Floor effects are therefore simulated to occur when $\bar{X} = -1.5$.  
+Given this, a non-linear relationship is expected where minimal decline is observed when mean performance is above -0.5. For those with lower mean performance, faster decline is expected until mean performance reaches -1.5 at which point decline slows again. Floor effects are therefore simulated to occur when $\bar{X} = -1.5$.  
 
 ```{r}
-# example_data <- longpoly_example_data()
-# 
-# example_data |> head()
+example_data <- longpoly_example_data
+
+example_data |> head(n = 10)
 ```
 
 

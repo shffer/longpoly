@@ -129,15 +129,28 @@ were combined and slopes ($Y$) were assigned conditionally as follows:
 - $Y \sim N(-0.15, 0.2)$  if     $\bar{X} < -2$
 
 Given this, a non-linear relationship is expected where minimal decline
-is expected when mean performance is above -0.5. For those with lower
+is observed when mean performance is above -0.5. For those with lower
 mean performance, faster decline is expected until mean performance
 reaches -1.5 at which point decline slows again. Floor effects are
 therefore simulated to occur when $\bar{X} = -1.5$.
 
 ``` r
-# example_data <- longpoly_example_data()
-# 
-# example_data |> head()
+example_data <- longpoly_example_data
+
+example_data |> head(n = 10)
+#> # A tibble: 10 × 3
+#>       id performance_mean performance_slope
+#>    <int>            <dbl>             <dbl>
+#>  1     1          -0.441            -0.188 
+#>  2     2           1.89             -0.399 
+#>  3     3          -1.23             -0.260 
+#>  4     4          -1.27             -0.455 
+#>  5     5          -0.0139           -0.0865
+#>  6     6          -0.0626           -0.431 
+#>  7     7           0.271             0.138 
+#>  8     8          -1.66              0.0906
+#>  9     9           0.216            -0.0948
+#> 10    10          -1.26             -0.724
 ```
 
 ### 2. Test Polynomials
