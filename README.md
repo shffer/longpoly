@@ -1,41 +1,143 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# longpoly <a href="https://dplyr.tidyverse.org"><img src="man/figures/longpoly_logo.png" align="right" height="200" /></a>
+# longpoly <a href="https://github.com/shffer/longpoly"><img src="man/figures/longpoly_logo.png" align="right" height="155"/></a>
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of longpoly is to …
+Longpoly provides a suite of tools to analyse longitudinal data. These
+are intended to be applied in instances where expected rates of change
+may vary across performance levels. The motivating use-case for longpoly
+was to investigate how average rates of cognitive decline depend on mean
+performance, but its utility extends to longitudinal data for other
+outcomes where similar relationships may be observed.
+
+This approach provides a novel “performance-adjusted” measure of rates
+of change. Linear slopes are fit over an individual’s longitudinal
+observations, and their mean score is calculated. Next, a polynomial is
+fit at the group level to predict rates of change as a function of mean
+score. A polynomial here allows for this relationship to be non-linear,
+and longpoly provides tools to select the polynomial order. **Finally,
+the residuals from this model are extracted as a measure of the extent
+to which an individual’s rate of change is faster or slower *than is
+typical for their mean level of performance*.**
+
+In the case of cognitive decline, this approach also offers a
+data-driven method to identify floor effects. Floor effects occur when
+cognitive assessments lack sensitivity to provide accurate measurements
+of performance in lower ranges. For longitudinal data, this means that
+cognitive decline in this range also cannot be reliably quantified.
+After fitting a polynomial model, longpoly can solve for the local
+minimum in the lower range of mean performance to identify the point
+where impaired performance becomes associated with slowed decline. While
+this is interpreted to reflect the range of performance where floor
+effects occur, it may alternatively reflect a true plateau in decline
+that occurs with advanced impairment. However, identifying this effect
+is also of interest as it is difficult to analyse rates of decline in
+participants in a plateau alongside those elsewhere on the spectrum of
+performance due to their fundamental differences. Longpoly can be used
+to filter out individuals with performance in the range for floor
+effects that it identifies.
 
 ## Installation
 
-You can install the development version of longpoly from
-[GitHub](https://github.com/) with:
+Longpoly can be installed from
+[GitHub](https://github.com/shffer/longpoly) as follows.
 
 ``` r
-# install.packages("pak")
-pak::pak("shffer/longpoly")
+# install.packages("devtools")
+devtools::install_github("shffer/longpoly")
 ```
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+### 1. Get Slopes and Mean
+
+The first step in the workflow is to submit a longitudinal data set to
+`get_slopes_and_mean()`. This function returns a tibble with “id”,
+“performance_slope”, and “performance_mean” columns. For the purposes of
+this example, I will create a dummy dataset of five participants, each
+with three timepoints.
+
+``` r
+n_participants = 5
+n_timepoints = 3
+
+set.seed(2222)
+
+dummy <- data.frame(
+  id = rep(1:n_participants, each = n_timepoints),
+  timepoint = rep(1:n_timepoints, times = n_participants),
+  performance = rnorm(n_participants * n_timepoints, mean = 0, sd = 1)
+)
+
+dummy |> head(n = 6)
+#>   id timepoint performance
+#> 1  1         1  -0.3380621
+#> 2  1         2   0.9391643
+#> 3  1         3   1.7377190
+#> 4  2         1   0.6963261
+#> 5  2         2   0.4622959
+#> 6  2         3  -0.3150868
+```
+
+This can now be used with `get_slopes_and_mean()`. Load longpoly
 
 ``` r
 library(longpoly)
-#> Loading required package: magrittr
-#> Loading required package: dplyr
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
-#> Loading required package: ggplot2
-#> Loading required package: ggpubr
+```
+
+Apply the function (specifying the column names)
+
+``` r
+sm <- get_slopes_and_mean(
+  data = dummy,
+  id_col = "id",
+  time_col = "timepoint",
+  outcome_col = "performance"
+)
+
+sm
+#> # A tibble: 5 × 3
+#>      id performance_slope performance_mean
+#>   <int>             <dbl>            <dbl>
+#> 1     1             1.04             0.780
+#> 2     2            -0.506            0.281
+#> 3     3             0.892            1.10 
+#> 4     4            -1.06             0.827
+#> 5     5             1.07            -0.853
+```
+
+### A Note About Simulated Data
+
+The dummy data used for `get_slopes_and_mean()` did not simulate any
+relationship between mean and slope values and is therefore of limited
+use in illustrating the utility of the other functions in longpoly.
+Rather than using this output, the remainder of this example workflow
+makes use of the `longpoly_example_data` example cognitive data set that
+is shipped with longpoly. In creating this data, 1000 mean values
+($\bar{X}$) were initially sampled from $N(0, 1)$ (cognitively
+unimpaired participants) and another 1000 mean values were then sampled
+from $N(-1.5, 0.75)$ (participants with cognitive impairment). The data
+were combined and slopes ($Y$) were assigned conditionally as follows:
+
+- $Y \sim N(-0.10, 0.2)$ if $-0.5 \le \bar{X}$
+- $Y \sim N(-0.30, 0.2)$ if $-1.0 \le \bar{X} < -0.5$
+- $Y \sim N(-0.45, 0.2)$ if $-1.5 \le \bar{X} < -1$
+- $Y \sim N(-0.25, 0.2)$ if $-2.0 \le \bar{X} < -1.5$
+- $Y \sim N(-0.15, 0.2)$ if     $\bar{X} < -2$
+
+Given this, a non-linear relationship is expected where minimal decline
+is expected when mean performance is above -0.5. For those with lower
+mean performance, faster decline is expected until mean performance
+reaches -1.5 at which point decline slows again. Floor effects are
+therefore simulated to occur when $\bar{X} = -1.5$.
+
+### 2. Test Polynomials
+
+``` r
+library(longpoly)
 ## basic example code
 ```
 
@@ -53,12 +155,6 @@ summary(cars)
 #>  Max.   :25.0   Max.   :120.00
 ```
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
-
-You can also embed plots, for example:
+Example embedded plot:
 
 <img src="man/figures/README-pressure-1.png" width="100%" />
-
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
