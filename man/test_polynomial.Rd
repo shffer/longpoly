@@ -4,12 +4,12 @@
 \alias{test_polynomial}
 \title{Test models with polynomials of differing orders to describe the relationship between linear rate of change and mean score in longitudinal data}
 \usage{
-test_polynomial(data, test_proportion = 2/3, max_order = 6)
+test_polynomial(data, test_proportion = 1/3, max_order = 6)
 }
 \arguments{
 \item{data}{output from \code{longpoly::get_slopes_and_mean()} (or any tibble with columns "id", "performance_slope", & "performance_mean")}
 
-\item{test_proportion}{the proportion of participants to allocate to the test set. default = \code{2/3}}
+\item{test_proportion}{the proportion of participants to allocate to the test set. default = \code{1/3}}
 
 \item{max_order}{the maximum order for polynomial models to be tested. Polynomial models for 1:\code{max_order} will be tested. default = \code{6}}
 }

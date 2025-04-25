@@ -15,7 +15,8 @@
 #' @export
 #'
 #' @examples
-#find_polynomial <- function(data, test_proportion = 1/3, idcol = "id", max_order = 6, x) {
+#' # example
+find_polynomial <- function(data, test_proportion = 1/3, idcol = "id", max_order = 6, x) {
 
 
   # Column names
@@ -88,6 +89,6 @@
     selected_order = selected_order,
     selected_model_coefficients = final_coefficients,
     train_ids = train_ids,
-    test_ids = test_ids,
+    test_ids = test_ids
   ))
 }

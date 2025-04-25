@@ -4,10 +4,28 @@
 \alias{find_polynomial}
 \title{Title}
 \usage{
-find_polynomial(data, test_proportion, idcol, max_order, x)
+find_polynomial(data, test_proportion = 1/3, idcol = "id", max_order = 6, x)
 }
 \arguments{
-\item{x}{}
+\item{data}{output from \code{longpoly::get_slopes_and_mean()} (or any tibble with columns "id", "performance_slope", & "performance_mean")}
+
+\item{test_proportion}{the proportion of participants to allocate to the test set. default = \code{1/3}}
+
+\item{idcol}{the column name corresponding to the ID variable in data. Default = \code{"id"}}
+
+\item{max_order}{the maximum order for polynomial models to be tested. Polynomial models for 1:\code{max_order} will be tested. default = \code{6}}
+
+\item{x}{Polynomials are selected after finding the maximum proportion of variance explained (PVE) in test data across all models, and then finding the most parsimonious model with a PVE that is at least max(PVE) - x}
+}
+\value{
+a list containing:
+\enumerate{
+\item 'polynomial_results' - a tibble with columns for the order of the model tested and the corresponding pve in the train and test data
+\item 'selected_order' - the order of the selected model (based on the max(PVE) - x criteria)
+\item 'selected_model_coefficients' - coefficients of the selected model (based on the max(PVE) - x criteria)
+\item 'train_ids' — a character vector of ids allocated to the train dataset in model development
+\item 'test_ids' — a character vector of ids allocated to the test dataset in model development
+}
 }
 \description{
 Title
