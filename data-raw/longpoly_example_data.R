@@ -2,8 +2,9 @@
 
 usethis::use_data(longpoly_example_data, overwrite = TRUE)
 
+
 # SIMULATE DATA ----
-set.seed(1111)
+set.seed(111)
 
 ## Parameters ----
 cu_participants <- 1000
