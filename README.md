@@ -126,7 +126,7 @@ were combined and slopes ($Y$) were assigned conditionally as follows:
 - $Y \sim N(-0.30, 0.2)$  if  $-1.0 \le \bar{X} < -0.5$
 - $Y \sim N(-0.45, 0.2)$  if  $-1.5 \le \bar{X} < -1$
 - $Y \sim N(-0.25, 0.2)$  if  $-2.0 \le \bar{X} < -1.5$
-- $Y \sim N(-0.15, 0.2)$  if     $\bar{X} < -2$
+- $Y \sim N(-0.15, 0.2)$  if  $\bar{X} < -2$
 
 Given this, a non-linear relationship is expected where minimal decline
 is observed when mean performance is above -0.5. For those with lower
@@ -135,45 +135,73 @@ reaches -1.5 at which point decline slows again. Floor effects are
 therefore simulated to occur when $\bar{X} = -1.5$.
 
 ``` r
-example_data <- longpoly_example_data
+example_data <- longpoly::longpoly_example_data
 
 example_data |> head(n = 10)
 #> # A tibble: 10 × 3
 #>       id performance_mean performance_slope
 #>    <int>            <dbl>             <dbl>
-#>  1     1          -0.441            -0.188 
-#>  2     2           1.89             -0.399 
-#>  3     3          -1.23             -0.260 
-#>  4     4          -1.27             -0.455 
-#>  5     5          -0.0139           -0.0865
-#>  6     6          -0.0626           -0.431 
-#>  7     7           0.271             0.138 
-#>  8     8          -1.66              0.0906
-#>  9     9           0.216            -0.0948
-#> 10    10          -1.26             -0.724
+#>  1     1            0.235           0.127  
+#>  2     2           -0.331           0.0715 
+#>  3     3           -0.312          -0.215  
+#>  4     4           -2.30            0.126  
+#>  5     5           -0.171          -0.215  
+#>  6     6            0.140          -0.219  
+#>  7     7           -1.50           -0.735  
+#>  8     8           -1.01           -0.444  
+#>  9     9           -0.948          -0.372  
+#> 10    10           -0.494           0.00156
 ```
 
 ### 2. Test Polynomials
+
+The tibble output from `get_slopes_and_mean()` can now be used for
+testing models that describe the relationship between slope and mean
+values using `test_polynomial()`. This function assigns participants in
+to train and test data sets and fits polynomials up to a maximum order
+specified by the user. It returns a list containing:
+
+1.  ‘polynomial_results’ a tibble with columns recording the order of
+    each polynomial tested with the corresponding PVE in test and train
+    data, as well as the additional PVE in the test data for the
+    increase in order for each
+
+2.  ‘train_ids’ a character vector of ids allocated to the train dataset
+    in model development
+
+3.  ‘test_ids’ a character vector of ids allocated to the test dataset
+    in model development
+
+4.  ‘scree_plot’ visualising the additional proportion of variance
+    exaplained (PVE) in the test data for higher order polynomial
+    models. This is calculated as follows:
+
+$$
+\begin{aligned}
+SS_{\text{residual}} &= \sum (x_i - \hat{x}_i)^2 \\
+SS_{\text{regression}} &= \sum (\hat{x}_i - \bar{x})^2 \\
+SS_{\text{total}} &= SS_{\text{regression}} + SS_{\text{residual}} \\
+\\
+PVE_{\text{test}} &= \frac{SS_{\text{regression}}}{SS_{\text{total}}}
+\end{aligned}
+$$
+
+------------------------------------------------------------------------
+
+**Where:**
+
+- $x_i$ = Calculated slope for the $i^{\text{th}}$ individual test set
+- $\hat{x}_i$ = Predicted slope for the $i^{\text{th}}$ individual in
+  the test set
+- $\bar{x}$ = Average of the slopes computed in the test set
+
+It is recommended that the order of the model be select as that to the
+left of the ‘elbow’ (where the improvement plateaus). For example, this
+would be three in the below (output from this function)
 
 ``` r
 library(longpoly)
 ## basic example code
 ```
-
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
-
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
-
-Example embedded plot:
 
 <img src="man/figures/README-pressure-1.png" width="100%" />
