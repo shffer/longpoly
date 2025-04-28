@@ -176,32 +176,30 @@ specified by the user. It returns a list containing:
     exaplained (PVE) in the test data for higher order polynomial
     models. This is calculated as follows:
 
-$$
-\begin{aligned}
-SS_{\text{residual}} &= \sum (x_i - \hat{x}_i)^2 \\
-SS_{\text{regression}} &= \sum (\hat{x}_i - \bar{x})^2 \\
-SS_{\text{total}} &= SS_{\text{regression}} + SS_{\text{residual}} \\
-\\
-PVE_{\text{test}} &= \frac{SS_{\text{regression}}}{SS_{\text{total}}}
-\end{aligned}
-$$
+<br>
 
-------------------------------------------------------------------------
+> $SS_{\text{residual}} = \sum (x_i - \hat{x}_i)^2$
 
-**Where:**
+> $SS_{\text{regression}} = \sum (\hat{x}_i - \bar{x})^2$
 
-- $x_i$ = Calculated slope for the $i^{\text{th}}$ individual test set
-- $\hat{x}_i$ = Predicted slope for the $i^{\text{th}}$ individual in
-  the test set
-- $\bar{x}$ = Average of the slopes computed in the test set
+> $SS_{\text{total}} = SS_{\text{regression}} + SS_{\text{residual}}$
+
+> $$
+> PVE_{\text{test}} = \frac{SS_{\text{regression}}}{SS_{\text{total}}}
+> $$
+
+> *Where:*
+>
+> $x_i$ *= Calculated slope for the* $i^{\text{th}}$ *individual test
+> set*
+>
+> $\hat{x}_i$ *= Predicted slope for the* $i^{\text{th}}$ *individual in
+> the test set*
+>
+> $\bar{x}$ *= Average of the slopes computed in the test set*
+
+<br>
 
 It is recommended that the order of the model be select as that to the
 left of the ‘elbow’ (where the improvement plateaus). For example, this
 would be three in the below (output from this function)
-
-``` r
-library(longpoly)
-## basic example code
-```
-
-<img src="man/figures/README-pressure-1.png" width="100%" />
