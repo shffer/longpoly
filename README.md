@@ -8,7 +8,7 @@
 
 Longpoly provides a suite of tools to analyse longitudinal data. These
 are intended to be applied in instances where expected rates of change
-may vary across performance levels. The motivating use-case for longpoly
+may vary across performance levels. The motivating use case for longpoly
 was to investigate how average rates of cognitive decline depend on mean
 performance, but its utility extends to longitudinal data for other
 outcomes where similar relationships may be observed.
@@ -122,11 +122,11 @@ unimpaired participants) and another 1000 mean values were then sampled
 from $N(-1.5, 0.75)$ (participants with cognitive impairment). The data
 were combined and slopes ($Y$) were assigned conditionally as follows:
 
-- $Y \sim N(-0.10, 0.2)$  if  $-0.5 \le \bar{X}$
-- $Y \sim N(-0.30, 0.2)$  if  $-1.0 \le \bar{X} < -0.5$
-- $Y \sim N(-0.45, 0.2)$  if  $-1.5 \le \bar{X} < -1$
-- $Y \sim N(-0.25, 0.2)$  if  $-2.0 \le \bar{X} < -1.5$
-- $Y \sim N(-0.15, 0.2)$  if  $\bar{X} < -2$
+> - $Y \sim N(-0.10, 0.2)$  if  $-0.5 \le \bar{X}$
+> - $Y \sim N(-0.30, 0.2)$  if  $-1.0 \le \bar{X} < -0.5$
+> - $Y \sim N(-0.45, 0.2)$  if  $-1.5 \le \bar{X} < -1$
+> - $Y \sim N(-0.25, 0.2)$  if  $-2.0 \le \bar{X} < -1.5$
+> - $Y \sim N(-0.15, 0.2)$  if  $\bar{X} < -2$
 
 Given this, a non-linear relationship is expected where minimal decline
 is observed when mean performance is above -0.5. For those with lower
@@ -155,39 +155,41 @@ example_data |> head(n = 10)
 
 ### 2. Test Polynomials
 
-The tibble output from `get_slopes_and_mean()` can now be used for
-testing models that describe the relationship between slope and mean
-values using `test_polynomial()`. This function assigns participants in
-to train and test data sets and fits polynomials up to a maximum order
-specified by the user. It returns a list containing:
+The tibble output from `get_slopes_and_mean()` (or the example data) can
+be used for testing models that describe the relationship between slope
+and mean values using `test_polynomial()`. This function assigns
+participants in to train and test data sets and fits polynomials up to a
+maximum order specified by the user. It returns a list containing:
 
-1.  ‘polynomial_results’ a tibble with columns recording the order of
-    each polynomial tested with the corresponding PVE in test and train
-    data, as well as the additional PVE in the test data for the
-    increase in order for each
+1.  ***polynomial_results*** - a tibble with columns recording the order
+    of each polynomial tested with the corresponding proportion of
+    variance explained (PVE) in test and train data, as well as the
+    additional PVE in the test data\* for every increase in polynomial
+    order
 
-2.  ‘train_ids’ a character vector of ids allocated to the train dataset
-    in model development
+2.  ***train_ids*** - a character vector of ids allocated to the train
+    data set in model development
 
-3.  ‘test_ids’ a character vector of ids allocated to the test dataset
-    in model development
+3.  ***test_ids*** - a character vector of ids allocated to the test
+    data set in model development
 
-4.  ‘scree_plot’ visualising the additional proportion of variance
-    exaplained (PVE) in the test data for higher order polynomial
-    models. This is calculated as follows:
+4.  ***scree_plot*** - a visualisation the additional PVE in the test
+    data\* for higher order polynomial models.
 
 <br>
 
+> *\*PVE in the test data is is calculated as follows:*
+>
 > $SS_{\text{residual}} = \sum (x_i - \hat{x}_i)^2$
-
+>
 > $SS_{\text{regression}} = \sum (\hat{x}_i - \bar{x})^2$
-
+>
 > $SS_{\text{total}} = SS_{\text{regression}} + SS_{\text{residual}}$
-
+>
 > $$
 > PVE_{\text{test}} = \frac{SS_{\text{regression}}}{SS_{\text{total}}}
 > $$
-
+>
 > *Where:*
 >
 > $x_i$ *= Calculated slope for the* $i^{\text{th}}$ *individual test
@@ -200,6 +202,205 @@ specified by the user. It returns a list containing:
 
 <br>
 
-It is recommended that the order of the model be select as that to the
-left of the ‘elbow’ (where the improvement plateaus). For example, this
-would be three in the below (output from this function)
+``` r
+set.seed(1111)
+test_results <- test_polynomial(data = example_data, test_proportion = 1/3, max_order = 6)
+
+test_results$polynomial_results
+#> # A tibble: 6 × 4
+#>   order pve_in_train_data pve_in_test_data additional_pve
+#>   <int>             <dbl>            <dbl>          <dbl>
+#> 1     1            0.0365           0.0381       0.0381  
+#> 2     2            0.0939           0.102        0.0639  
+#> 3     3            0.148            0.170        0.0682  
+#> 4     4            0.152            0.174        0.00417 
+#> 5     5            0.204            0.200        0.0254  
+#> 6     6            0.204            0.200        0.000795
+```
+
+``` r
+plot(test_results$scree_plot)
+```
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="60%" height="40%" />
+
+These outputs suggest that additional PVE plateaus at models of the 4th
+order or higher indicating that a 3rd order polynomial is appropriate
+for the example data set.
+
+# 2a Find Polynomial
+
+Visual assessment of the scree plot above may not always readily discern
+an appropriate polynomial order and a data driven approach may be
+preferred. The `find_polynomial()`function offers an alternative
+approach to selecting a model that addresses this. Specifically,
+$\max(PVE_{test})$ across all models is extracted, and the most
+parsimonious model with $PVE \ge (max(PVE_{test}) - x)$ (where $x$ is a
+user defined threshold) is selected. This allows the user to determine a
+trade-off between model fit (and potential overfitting) and model
+simplicity. The function returns a list containing:
+
+1.  ***polynomial_results*** - a tibble with columns recording the order
+    of each polynomial tested with the corresponding proportion of
+    variance explained (PVE) in test and train data (these columns will
+    be identical to those returned from `test_polynomial()` if the same
+    data and seed are used)
+
+2.  ***selected_order*** - the order of the selected model (based on the
+    $max(PVE_{test}) - x$ criteria)
+
+3.  ***selected_model_coefficients*** - coefficients of the selected
+    model (based on the $max(PVE_{test}) - x$ criteria)
+
+4.  ***train_ids*** - a character vector of ids allocated to the train
+    data set in model development
+
+5.  ***test_ids*** - a character vector of ids allocated to the test
+    data set in model development
+
+<br>
+
+Setting $x = 0.05$ with the example data returns the following
+
+``` r
+set.seed(1111)
+find_poly_results <- find_polynomial(data = example_data, test_proportion = 1/3, max_order = 6, x = 0.05)
+
+find_poly_results[1:3]
+#> $polynomial_results
+#> # A tibble: 6 × 3
+#>   order pve_in_train_data pve_in_test_data
+#>   <int>             <dbl>            <dbl>
+#> 1     1               3.5              3.8
+#> 2     2               9.1             10.2
+#> 3     3              14.4             17  
+#> 4     4              14.7             17.4
+#> 5     5              19.8             20  
+#> 6     6              19.7             20  
+#> 
+#> $selected_order
+#> [1] 3
+#> 
+#> $selected_model_coefficients
+#>                            (Intercept) poly(performance_mean, 3, raw = TRUE)1 
+#>                           -0.164037069                            0.129172597 
+#> poly(performance_mean, 3, raw = TRUE)2 poly(performance_mean, 3, raw = TRUE)3 
+#>                           -0.004785321                           -0.018976382
+```
+
+The function selects the third order polynomial and is given by
+$y = -0.164 + 0.129x - 0.005x^2 - 0.019x^3$. While this agrees with
+`test_polynomial()`, note that a more conservative value for `x` would
+have selected a higher order model. For example $x = 0.02$ would select
+the fifth order model since no lower order models have
+$PVE_{test} \ge 0.18$.
+
+# 3. Implement Polynomial
+
+After selecting a polynomial order (typically either by reviewing the
+scree plot output by `test_polynomial()` or by using `find_polynomial()`
+to select on the data-driven process described above), this model is
+implemented using `implement_polynomial()`. An optional parameter,
+`floor_effects()`, determines whether individuals with floor effects
+should be identified. If this is set to true, the `floor_range()`
+argument must be specified and reflects the range in mean values over
+which a minimum value for slope will be found. The function returns a
+list with the following:
+
+1.  ***model_formula*** — the formula of the final model
+2.  ***final_data*** — a tibble with columns for “id”,
+    “performance_slope”, “performance_mean”, “predicted_slope”, and
+    “residual”. If `floor_effects = TRUE`, an additional column
+    “floor_effects” is appended with either “keep” or “remove”
+    reflecting whether the recorded should be removed based on the
+    identified performance_mean threshold for floor effects
+3.  ***threshold*** — if floor_effects = TRUE, this records the
+    threshold used for floor effect classifications
+
+For the example data, Steps 2 and 2a (above) selected a third order
+polynomial. Implementing this model returns the following
+
+``` r
+poly_out <- 
+  implement_polynomial(
+    data = example_data,
+    order = 3,
+    floor_effects = TRUE,
+    floor_range = c(min(example_data$performance_mean), 0)
+  )
+
+poly_out$model_formula
+#> performance_slope ~ poly(performance_mean, 3, raw = TRUE)
+#> <environment: 0x0000012c94abd508>
+head(poly_out$final_data)
+#> # A tibble: 6 × 6
+#>      id performance_mean performance_slope predicted_slope residual
+#>   <int>            <dbl>             <dbl>           <dbl>    <dbl>
+#> 1     1            0.235            0.127           -0.134   0.261 
+#> 2     2           -0.331            0.0715          -0.207   0.278 
+#> 3     3           -0.312           -0.215           -0.204  -0.0105
+#> 4     4           -2.30             0.126           -0.255   0.381 
+#> 5     5           -0.171           -0.215           -0.186  -0.0289
+#> 6     6            0.140           -0.219           -0.146  -0.0725
+#> # ℹ 1 more variable: floor_effects <fct>
+poly_out$threshold
+#> [1] -1.592723
+```
+
+Importantly, a “residual” column has been added in the `final_data`
+tibble. **This is the performance adjusted measure rate of change that
+is the intended output from `longpoly`.**
+
+Note also that the floor effects threshold has been identified at -1.59.
+The data were simulated to show floor effects when mean performance is
+at -1.5 ($\pm$ a noise factor) so this is a reasonable approximation of
+what was expected.
+
+# 4. Plot Polynomial
+
+`plot_polyomial()` can be used to produce plots in the train and test
+data sets (using the id vectors produced by `test_polynomial()` or
+`find_polynomial` to define these), the polynomial in the whole cohort,
+and the whole cohort after assigning keep/remove status based on floor
+effects (use the threshold from `implement_polynomial()` for this).
+These plots are returned as `ggplot` objects in a named list.
+
+``` r
+plots <-
+  plot_polynomial(
+    data = poly_out$final_data,
+    order = 3,
+    whole_cohort_title = "Selected Polynomial in Whole Cohort",
+    whole_cohort_only = FALSE,
+    train_id = test_results$train_ids,
+    test_id = test_results$test_ids,
+    train_title = "Selected Polynomial in Train Cohort",
+    test_title = "Slected Polynomial in Test Cohort",
+    keep_remove = TRUE,
+    threshold = poly_out$threshold,
+    threshold_linetype = "dashed",
+    threshold_line_color = "#5f6a7a",
+    annotate_floor_thresh = TRUE,
+    legend_position = "bottom",
+  )
+
+plots
+#> $whole_cohort
+```
+
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="60%" height="60%" />
+
+    #> 
+    #> $train
+
+<img src="man/figures/README-unnamed-chunk-10-2.png" width="60%" height="60%" />
+
+    #> 
+    #> $test
+
+<img src="man/figures/README-unnamed-chunk-10-3.png" width="60%" height="60%" />
+
+    #> 
+    #> $keep_remove
+
+<img src="man/figures/README-unnamed-chunk-10-4.png" width="60%" height="60%" />
