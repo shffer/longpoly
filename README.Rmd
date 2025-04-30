@@ -241,6 +241,7 @@ The function `filter_slopes_and_mean()` filters data in the extreme ranges for m
 
 Since the values in the right tail in the example data were simulated from a separate distribution ( $N(0,1)$ ) than those in the left ( $N(-1.5, 0.75)$ ), I will perform filtering separately. For the right tail, I will set the window size to capture values above 2 (i.e., those more than 2SD above the distribution mean), and require at least 25 (out of 1000) observations in that range. 
 
+
 ```{r}
 filtered_example_data <- filter_slopes_and_mean(
   data = example_data,
@@ -263,7 +264,9 @@ filtered_example_data <- filter_slopes_and_mean(
 )
 ```
 
+
 For brevity, I will skip the `test_polynomial` and `find_polynomial` steps and instead implement a third order polynomial and filter for floor effects (but in practice, the chosen development steps should not be skipped).
+
 
 ```{r, out.height= "60%", out.width= "60%", results = FALSE}
 poly_out_filtered <- 

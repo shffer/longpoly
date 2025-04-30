@@ -331,7 +331,7 @@ poly_out <-
 
 poly_out$model_formula
 #> performance_slope ~ poly(performance_mean, 3, raw = TRUE)
-#> <environment: 0x0000014e971a2510>
+#> <environment: 0x000001e693147510>
 
 # temporarily shorten names in final_data so example can be printed without spilling over
 poly_out$final_data %>% set_names(gsub("performance_", "", colnames(poly_out$final_data))) %>% head
