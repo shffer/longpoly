@@ -228,7 +228,7 @@ These outputs suggest that additional PVE plateaus at models of the 4th
 order or higher indicating that a 3rd order polynomial is appropriate
 for the example data set.
 
-# 2a Find Polynomial
+### 2a Find Polynomial
 
 Visual assessment of the scree plot above may not always readily discern
 an appropriate polynomial order and a data driven approach may be
@@ -295,7 +295,7 @@ have selected a higher order model. For example $x = 0.02$ would select
 the fifth order model since no lower order models have
 $PVE_{test} \ge 0.18$.
 
-# 3. Implement Polynomial
+### 3. Implement Polynomial
 
 After selecting a polynomial order (typically either by reviewing the
 scree plot output by `test_polynomial()` or by using `find_polynomial()`
@@ -312,7 +312,7 @@ list with the following:
     “performance_slope”, “performance_mean”, “predicted_slope”, and
     “residual”. If `floor_effects = TRUE`, an additional column
     “floor_effects” is appended with either “keep” or “remove”
-    reflecting whether the recorded should be removed based on the
+    reflecting whether the record should be removed based on the
     identified performance_mean threshold for floor effects
 3.  ***threshold*** — if floor_effects = TRUE, this records the
     threshold used for floor effect classifications
@@ -331,39 +331,42 @@ poly_out <-
 
 poly_out$model_formula
 #> performance_slope ~ poly(performance_mean, 3, raw = TRUE)
-#> <environment: 0x0000012c94abd508>
-head(poly_out$final_data)
+#> <environment: 0x0000014e971a2510>
+
+# temporarily shorten names in final_data so example can be printed without spilling over
+poly_out$final_data %>% set_names(gsub("performance_", "", colnames(poly_out$final_data))) %>% head
 #> # A tibble: 6 × 6
-#>      id performance_mean performance_slope predicted_slope residual
-#>   <int>            <dbl>             <dbl>           <dbl>    <dbl>
-#> 1     1            0.235            0.127           -0.134   0.261 
-#> 2     2           -0.331            0.0715          -0.207   0.278 
-#> 3     3           -0.312           -0.215           -0.204  -0.0105
-#> 4     4           -2.30             0.126           -0.255   0.381 
-#> 5     5           -0.171           -0.215           -0.186  -0.0289
-#> 6     6            0.140           -0.219           -0.146  -0.0725
-#> # ℹ 1 more variable: floor_effects <fct>
+#>      id   mean   slope predicted_slope residual floor_effects
+#>   <int>  <dbl>   <dbl>           <dbl>    <dbl> <fct>        
+#> 1     1  0.235  0.127           -0.134   0.261  keep         
+#> 2     2 -0.331  0.0715          -0.207   0.278  keep         
+#> 3     3 -0.312 -0.215           -0.204  -0.0105 keep         
+#> 4     4 -2.30   0.126           -0.255   0.381  remove       
+#> 5     5 -0.171 -0.215           -0.186  -0.0289 keep         
+#> 6     6  0.140 -0.219           -0.146  -0.0725 keep
+
 poly_out$threshold
 #> [1] -1.592723
 ```
 
 Importantly, a “residual” column has been added in the `final_data`
-tibble. **This is the performance adjusted measure rate of change that
-is the intended output from `longpoly`.**
+tibble. **This is the performance-adjusted measure of rate of change
+that is the intended output from `longpoly`.**
 
-Note also that the floor effects threshold has been identified at -1.59.
-The data were simulated to show floor effects when mean performance is
-at -1.5 ($\pm$ a noise factor) so this is a reasonable approximation of
-what was expected.
+*Note also that the floor effects threshold has been identified at
+-1.59. The example data were simulated to show floor effects when mean
+performance \< -1.5 (*$\pm$ *a noise factor) so this is a reasonable
+approximation of what was expected.*
 
-# 4. Plot Polynomial
+### 4. Plot Polynomial
 
-`plot_polyomial()` can be used to produce plots in the train and test
-data sets (using the id vectors produced by `test_polynomial()` or
-`find_polynomial` to define these), the polynomial in the whole cohort,
-and the whole cohort after assigning keep/remove status based on floor
-effects (use the threshold from `implement_polynomial()` for this).
-These plots are returned as `ggplot` objects in a named list.
+`plot_polyomial()` can be used to produce plots of a polynomial of a
+given order in the train and test data sets during model development
+(using the id vectors produced by `test_polynomial()` or
+`find_polynomial` to define these), in the whole cohort, and in the
+whole cohort with keep/remove status based on floor effects assigned
+(use the threshold from `implement_polynomial()` for this). These plots
+are returned as `ggplot` objects in a named list.
 
 ``` r
 plots <-
@@ -375,7 +378,7 @@ plots <-
     train_id = test_results$train_ids,
     test_id = test_results$test_ids,
     train_title = "Selected Polynomial in Train Cohort",
-    test_title = "Slected Polynomial in Test Cohort",
+    test_title = "Selected Polynomial in Test Cohort",
     keep_remove = TRUE,
     threshold = poly_out$threshold,
     threshold_linetype = "dashed",
@@ -385,22 +388,122 @@ plots <-
   )
 
 plots
-#> $whole_cohort
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="60%" height="60%" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="60%" height="60%" /><img src="man/figures/README-unnamed-chunk-10-2.png" width="60%" height="60%" /><img src="man/figures/README-unnamed-chunk-10-3.png" width="60%" height="60%" /><img src="man/figures/README-unnamed-chunk-10-4.png" width="60%" height="60%" />
 
-    #> 
-    #> $train
+### 5. Data Filtering
 
-<img src="man/figures/README-unnamed-chunk-10-2.png" width="60%" height="60%" />
+Simulated data offers the benefit of knowing what our results *should*
+look like. We expected a third order polynomial with a floor effect when
+mean performance $\approx -1.5$, as was seen. However, our final model
+also shows a prominent downward slope in its right tail that gives the
+impression that faster decline (more negative slopes) is expected when
+mean values exceed a value of approximately 2. This was not an effect
+that was simulated to exist – in fact, slopes were sampled from
+$N(-0.10, 0.2)$ for all mean values $\ge -0.5$ meaning that the
+polynomial should be flat in this region to reflect the “true” effect.
 
-    #> 
-    #> $test
+This observation reflects the (misleading) influence that scarce data
+points in the extremes of the distribution of mean performance can
+exert. Assessment of the whole cohort plot above suggests that, for data
+with mean performance \> 2, random sampling led to an over
+representation of more negative slopes. Review of the data in this range
+confirms this.
 
-<img src="man/figures/README-unnamed-chunk-10-3.png" width="60%" height="60%" />
+``` r
+example_data %>% filter(performance_mean > 2) %>% select(performance_slope) %>% summary
+#>  performance_slope
+#>  Min.   :-0.4833  
+#>  1st Qu.:-0.2842  
+#>  Median :-0.1766  
+#>  Mean   :-0.1760  
+#>  3rd Qu.:-0.1244  
+#>  Max.   : 0.2519
+```
 
-    #> 
-    #> $keep_remove
+If we sampled enough observations in this range, these summary
+statistics would instead reflect the distribution from which it was
+sampled. However, these mean values come from the Cognitively Unimpaired
+participants (see ‘A Note About Simulated Data’ above) and were sampled
+from $N(0,1)$. A score of 2 is therefore 2SD from the mean of its
+distribution and explains why data are scarce in this range.
 
-<img src="man/figures/README-unnamed-chunk-10-4.png" width="60%" height="60%" />
+The function `filter_slopes_and_mean()` filters data in the extreme
+ranges for mean values according to user-defined criteria. A window
+reflecting the “width” of the extreme range is defined and a minimum
+number of observations for that range is defined. If the actual number
+of observations is less than the specified minimum, data in the window
+are removed. This can be performed on the left or right tails (or both),
+and if data points are removed from either, the polynomial fitting
+process (i.e., Steps 2 to 4) should be repeated.
+
+Since the values in the right tail in the example data were simulated
+from a separate distribution ( $N(0,1)$ ) than those in the left (
+$N(-1.5, 0.75)$ ), I will perform filtering separately. For the right
+tail, I will set the window size to capture values above 2 (i.e., those
+more than 2SD above the distribution mean), and require at least 25 (out
+of 1000) observations in that range.
+
+``` r
+filtered_example_data <- filter_slopes_and_mean(
+  data = example_data,
+  window_size = max(example_data$performance_mean) - 2,
+  min_obs = 25,
+  max_filter = TRUE,
+  min_filter = FALSE
+)
+```
+
+I will now filter this data set for ranges in the left tail. For this, I
+will set the window size to capture any mean values less than - 3.25
+(i.e., those more than 2SD below the distribution mean) and again
+require at least 25 observations.
+
+``` r
+filtered_example_data <- filter_slopes_and_mean(
+  data = filtered_example_data,
+  window_size = min(filtered_example_data$performance_mean) + 3.25,
+  min_obs = 25,
+  max_filter = FALSE,
+  min_filter = TRUE
+)
+```
+
+For brevity, I will skip the `test_polynomial` and `find_polynomial`
+steps and instead implement a third order polynomial and filter for
+floor effects (but in practice, the chosen development steps should not
+be skipped).
+
+``` r
+poly_out_filtered <- 
+  implement_polynomial(
+    data = filtered_example_data,
+    order = 3,
+    floor_effects = TRUE,
+    floor_range = c(min(filtered_example_data$performance_mean), 0)
+  )
+
+plots_filtered <-
+  plot_polynomial(
+    data = poly_out_filtered$final_data,
+    order = 3,
+    whole_cohort_title = "Selected Polynomial in Whole Cohort",
+    whole_cohort_only = TRUE,
+    keep_remove = TRUE,
+    threshold = poly_out_filtered$threshold,
+    threshold_linetype = "dashed",
+    threshold_line_color = "#5f6a7a",
+    annotate_floor_thresh = TRUE,
+    legend_position = "bottom",
+  )
+
+plots_filtered$keep_remove
+```
+
+<img src="man/figures/README-unnamed-chunk-14-1.png" width="60%" height="60%" />
+
+This process has removed scarce data in both extremes in the
+distribution of mean values, and has resulted in an identified threshold
+for floor effects of -1.53 which is closer to the simulated effect of
+-1.5. The downward trend on the right tail is also now less prominent.
