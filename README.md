@@ -222,7 +222,7 @@ test_results$polynomial_results
 plot(test_results$scree_plot)
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="60%" height="40%" />
+<img src="README_files/figure-gfm/unnamed-chunk-7-1.png" width="60%" height="40%" />
 
 These outputs suggest that additional PVE plateaus at models of the 4th
 order or higher indicating that a 3rd order polynomial is appropriate
@@ -271,12 +271,12 @@ find_poly_results[1:3]
 #> # A tibble: 6 × 3
 #>   order pve_in_train_data pve_in_test_data
 #>   <int>             <dbl>            <dbl>
-#> 1     1               3.5              3.8
-#> 2     2               9.1             10.2
-#> 3     3              14.4             17  
-#> 4     4              14.7             17.4
-#> 5     5              19.8             20  
-#> 6     6              19.7             20  
+#> 1     1            0.0365           0.0381
+#> 2     2            0.0939           0.102 
+#> 3     3            0.148            0.170 
+#> 4     4            0.152            0.174 
+#> 5     5            0.204            0.200 
+#> 6     6            0.204            0.200 
 #> 
 #> $selected_order
 #> [1] 3
@@ -330,8 +330,7 @@ poly_out <-
   )
 
 poly_out$model_formula
-#> performance_slope ~ poly(performance_mean, 3, raw = TRUE)
-#> <environment: 0x000001e693147510>
+#> [1] "y = -0.164 +0.129x -0.005x^2 -0.019x^3"
 
 # temporarily shorten names in final_data so example can be printed without spilling over
 poly_out$final_data %>% set_names(gsub("performance_", "", colnames(poly_out$final_data))) %>% head
@@ -390,7 +389,7 @@ plots <-
 plots
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="60%" height="60%" /><img src="man/figures/README-unnamed-chunk-10-2.png" width="60%" height="60%" /><img src="man/figures/README-unnamed-chunk-10-3.png" width="60%" height="60%" /><img src="man/figures/README-unnamed-chunk-10-4.png" width="60%" height="60%" />
+<img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="60%" height="60%" /><img src="README_files/figure-gfm/unnamed-chunk-10-2.png" width="60%" height="60%" /><img src="README_files/figure-gfm/unnamed-chunk-10-3.png" width="60%" height="60%" /><img src="README_files/figure-gfm/unnamed-chunk-10-4.png" width="60%" height="60%" />
 
 ### 5. Data Filtering
 
@@ -453,21 +452,27 @@ filtered_example_data <- filter_slopes_and_mean(
   max_filter = TRUE,
   min_filter = FALSE
 )
+#> [1] "number of observations in max window:  22"
+#> [1] "user defined miniumum number of observations:  25"
+#> [1] "data in max window removed"
 ```
 
 I will now filter this data set for ranges in the left tail. For this, I
-will set the window size to capture any mean values less than - 3.25
-(i.e., those more than 2SD below the distribution mean) and again
-require at least 25 observations.
+will set the window size to capture any mean values less than - 3 (i.e.,
+those more than 2SD below the distribution mean) and again require at
+least 25 observations.
 
 ``` r
 filtered_example_data <- filter_slopes_and_mean(
   data = filtered_example_data,
-  window_size = min(filtered_example_data$performance_mean) + 3.25,
+  window_size = -3 - min(filtered_example_data$performance_mean),
   min_obs = 25,
   max_filter = FALSE,
   min_filter = TRUE
 )
+#> [1] "number of observations in min window:  37"
+#> [1] "user defined miniumum number of observations:  25"
+#> [1] "data in min window not removed"
 ```
 
 For brevity, I will skip the `test_polynomial` and `find_polynomial`
@@ -501,9 +506,33 @@ plots_filtered <-
 plots_filtered$keep_remove
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" width="60%" height="60%" />
+<img src="README_files/figure-gfm/unnamed-chunk-14-1.png" width="60%" height="60%" />
 
-This process has removed scarce data in both extremes in the
-distribution of mean values, and has resulted in an identified threshold
-for floor effects of -1.53 which is closer to the simulated effect of
--1.5. The downward trend on the right tail is also now less prominent.
+Based on our minimum count of 25 observations, the maximum range of mean
+scores was filtered (n = 22 with $\bar{X}$ \> 2) but not the minimum
+range (n = 37 with $\bar{X}$ \< -3). The identified threshold (now -1.6)
+did not change meaningfully from its previous value (i.e., -1.59), but
+the downward trend on the right tail is now less prominent.
+
+The residuals from this model can now be extracted from the participants
+above the floor effects threshold:
+
+``` r
+poly_out_filtered$final_data %>% 
+  filter(floor_effects == "keep") %>% 
+  select(id, residual) %>% 
+  head(n = 10)
+#> # A tibble: 10 × 2
+#>       id residual
+#>    <int>    <dbl>
+#>  1     1   0.258 
+#>  2     2   0.276 
+#>  3     3  -0.0132
+#>  4     5  -0.0319
+#>  5     6  -0.0760
+#>  6     7  -0.428 
+#>  7     8  -0.164 
+#>  8     9  -0.0977
+#>  9    10   0.226 
+#> 10    11   0.129
+```

@@ -8,7 +8,6 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-",
   out.width = "100%"
 )
 ```
@@ -252,12 +251,12 @@ filtered_example_data <- filter_slopes_and_mean(
 )
 ```
 
-I will now filter this data set for ranges in the left tail. For this, I will set the window size to capture any mean values less than - 3.25 (i.e., those more than 2SD below the distribution mean) and again require at least 25 observations. 
+I will now filter this data set for ranges in the left tail. For this, I will set the window size to capture any mean values less than - 3 (i.e., those more than 2SD below the distribution mean) and again require at least 25 observations. 
 
 ```{r}
 filtered_example_data <- filter_slopes_and_mean(
   data = filtered_example_data,
-  window_size = min(filtered_example_data$performance_mean) + 3.25,
+  window_size = -3 - min(filtered_example_data$performance_mean),
   min_obs = 25,
   max_filter = FALSE,
   min_filter = TRUE
@@ -295,4 +294,13 @@ plots_filtered$keep_remove
 
 ```
 
-This process has removed scarce data in both extremes in the distribution of mean values, and has resulted in an identified threshold for floor effects of -1.53 which is closer to the simulated effect of -1.5. The downward trend on the right tail is also now less prominent.
+Based on our minimum count of 25 observations, the maximum range of mean scores was filtered (n = 22 with $\bar{X}$ > 2) but not the minimum range (n = 37 with $\bar{X}$ < -3). The identified threshold (now -1.6) did not change meaningfully from its previous value (i.e., -1.59), but the downward trend on the right tail is now less prominent.
+
+The residuals from this model can now be extracted from the participants above the floor effects threshold:
+```{r}
+poly_out_filtered$final_data %>% 
+  filter(floor_effects == "keep") %>% 
+  select(id, residual) %>% 
+  head(n = 10)
+```
+
