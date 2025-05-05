@@ -1,4 +1,4 @@
-#' Title
+#' A data-driven approach to choosing order of polynomial model describing the relationship between linear rate of change and mean score in longitudinal data
 #'
 #' @param data output from `longpoly::get_slopes_and_mean()` (or any tibble with columns "id", "performance_slope", & "performance_mean")
 #' @param test_proportion the proportion of participants to allocate to the test set. default = `1/3`
@@ -15,15 +15,28 @@
 #' @export
 #'
 #' @examples
-#' # example
+#' find_poly_results <- find_polynomial(data = longpoly_example_data, test_proportion = 1/3, max_order = 6, x = 0.05)
+#'
+#' # View proportion of variance explained in the train and test data for each polynomial tested
+#' find_poly_results$polynomial_results
+#'
+#' # View the order of the selected model
+#' find_poly_results$selected_order
+#'
+#' # View the coefficients of the selected model
+#' find_poly_results$selected_model_coefficients
+#'
+#' # The IDs of the participants allocated to the train and test sets are stored in the following vectors
+#' find_poly_results$train_ids |> head()
+#' find_poly_results$test_ids |> head()
+
 find_polynomial <- function(data, test_proportion = 1/3, idcol = "id", max_order = 6, x) {
 
-
-  # Column names
+  # column names (get_slopes_and_mean() output)
   outcome <- "performance_slope"
   predictor <- "performance_mean"
 
-  # Split data into train and test
+  # train and test
   unique_ids <- unique(data[[idcol]])
   sample_size <- round(length(unique_ids) * test_proportion)
   train_ids <- sample(unique_ids, size = sample_size, replace = FALSE)
@@ -32,7 +45,7 @@ find_polynomial <- function(data, test_proportion = 1/3, idcol = "id", max_order
   test <- data %>% filter(!.data[[idcol]] %in% train_ids)
   test_ids <- test[[idcol]]
 
-  # Function to compute proportion of variance explained
+  # function to compute proportion of variance explained
   compute_performance <- function(model, data, outcome) {
     pred <- predict(model, newdata = data)
     actual <- data[[outcome]]
@@ -40,13 +53,13 @@ find_polynomial <- function(data, test_proportion = 1/3, idcol = "id", max_order
     SS.total <- sum((actual - mean(actual, na.rm = TRUE))^2, na.rm = TRUE)
     SS.regression <- sum((pred - mean(actual, na.rm = TRUE))^2, na.rm = TRUE)
 
-    result <- SS.regression / SS.total  # Fraction of variability explained
-    return(result * 100)  # Convert to percentage
+    result <- SS.regression / SS.total
+    return(result)
   }
 
-  # Store performance results
+  # performance results
   polynomial_results <- tibble(order = integer(), pve_in_train_data = numeric(), pve_in_test_data = numeric())
-  models <- list()  # Store models for later retrieval
+  models <- list()
 
   for (order in 1:max_order) {
     formula <- as.formula(paste(outcome, "~ poly(", predictor, ",", order, ", raw=TRUE)"))
@@ -57,33 +70,32 @@ find_polynomial <- function(data, test_proportion = 1/3, idcol = "id", max_order
     polynomial_results <- polynomial_results %>%
       add_row(
         order = order,
-        pve_in_train_data = round(summary(model)$adj.r.squared * 100, 1),  # Convert to percentage and round
-        pve_in_test_data = round(compute_performance(model, test, outcome), 1)  # Convert to percentage and round
+        pve_in_train_data = compute_performance(model, train, outcome), #summary(model)$adj.r.squared,
+        pve_in_test_data = compute_performance(model, test, outcome)
       )
   }
 
-  # Identify the best polynomial model
+  # identify best model
   max_pve_test <- max(polynomial_results$pve_in_test_data, na.rm = TRUE)
-  threshold <- round(max_pve_test - (x * 100), 1)  # Convert x to percentage and round
+  threshold <- max_pve_test - x
 
   best_model_info <- polynomial_results %>%
-    arrange(order) %>%  # Ensure sorting by order before filtering
+    arrange(order) %>%
     filter(pve_in_test_data >= threshold) %>%
-    slice(1)  # Select the lowest order that meets the condition
+    slice(1)
 
   selected_order <- best_model_info$order
 
-  # Retrieve the selected model
+  # retrieve selected model
   selected_model <- models[[as.character(selected_order)]]
 
-  # Run the selected model on the full dataset
+  # run selected model on full dataset
   final_formula <- as.formula(paste(outcome, "~ poly(", predictor, ",", selected_order, ", raw=TRUE)"))
   final_model <- lm(final_formula, data = data)
 
-  # Extract coefficients from the final model
+  # extract coefficients from the final model
   final_coefficients <- coef(final_model)
 
-  # Return results
   return(list(
     polynomial_results = polynomial_results,
     selected_order = selected_order,

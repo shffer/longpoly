@@ -14,20 +14,18 @@
 #' @import magrittr
 #' @examples
 #'
-#' # test_polynomial(slope_mean_tibble,
-#' #                 test_proportion = 0.75,
-#' #                 max_order = 5)
-#' #
-#' # # alternatively, the output from longpoly::get_slopes_and_mean() may be directly piped in, e.g.:
-#' #
-#' # get_slopes_and_mean(example_data,
-#' #                     id_col = "id",
-#' #                     outcome_col = "memory_test",
-#' #                     time_col = "time") %>%
-#' #   test_polynomial(.,
-#' #                 test_proportion = 0.75,
-#' #                 max_order = 5)
+#' test_results <- test_polynomial(data = longpoly_example_data, test_proportion = 1/3, max_order = 6)
 #'
+#' # View proportion of variance explained in the train and test data for each polynomial tested
+#' test_results$polynomial_results
+#'
+#' # The IDs of the participants allocated to the train and test sets are stored in the following vectors
+#' test_results$train_ids |> head()
+#' test_results$test_ids |> head()
+#'
+#'# View the scree plot showing the additional variance explained (test data) for each increase in polynomial order
+#' test_results$scree_plot
+
 
 
 test_polynomial <-

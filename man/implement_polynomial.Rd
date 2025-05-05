@@ -33,6 +33,25 @@ Fit a polynomial of a specified order to describe the relationship between linea
 }
 \examples{
 
+poly_out <-
+implement_polynomial(
+  data = longpoly_example_data,
+  order = 3,
+  floor_effects = TRUE,
+  floor_range = c(min(longpoly_example_data$performance_mean), 0)
+)
+
+# View the equation of the final model
+poly_out$model_formula
+
+# View the final data
+poly_out$final_data |> head()
+
+# View the selected threshold
+ poly_out$threshold
+
+# Other example uses:
+
 # implement_polynomial(example_slope_mean_data,
 #                      floor_effects = FALSE)
 #

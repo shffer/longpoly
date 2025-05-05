@@ -2,7 +2,7 @@
 % Please edit documentation in R/find_polynomial.R
 \name{find_polynomial}
 \alias{find_polynomial}
-\title{Title}
+\title{A data-driven approach to choosing order of polynomial model describing the relationship between linear rate of change and mean score in longitudinal data}
 \usage{
 find_polynomial(data, test_proportion = 1/3, idcol = "id", max_order = 6, x)
 }
@@ -28,8 +28,21 @@ a list containing:
 }
 }
 \description{
-Title
+A data-driven approach to choosing order of polynomial model describing the relationship between linear rate of change and mean score in longitudinal data
 }
 \examples{
-# example
+find_poly_results <- find_polynomial(data = longpoly_example_data, test_proportion = 1/3, max_order = 6, x = 0.05)
+
+# View proportion of variance explained in the train and test data for each polynomial tested
+find_poly_results$polynomial_results
+
+# View the order of the selected model
+find_poly_results$selected_order
+
+# View the coefficients of the selected model
+find_poly_results$selected_model_coefficients
+
+# The IDs of the participants allocated to the train and test sets are stored in the following vectors
+find_poly_results$train_ids |> head()
+find_poly_results$test_ids |> head()
 }

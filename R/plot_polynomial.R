@@ -48,28 +48,37 @@
 #' @importFrom ggpubr ggscatter
 #' @examples
 #'
-#' # if implement_polynomial results were output to polynomial_data, plots can be produced as follows
+#' # test_polynomial() (or find_polynomial()) occur earlier in the workflow and assign train and test IDs
+#' test_results <- test_polynomial(data = longpoly_example_data, test_proportion = 1/3, max_order = 6)
 #'
-#' #' # plots <-
-#' #   plot_polynomials(
-#' #     data = polynomial_data$final_data,
-#' #     order = 3,
-#' #     whole_cohort_title = "Selected Polynomial in Whole Cohort",
-#' #     whole_cohort_only = FALSE,
-#' #     train_id = results$train_ids,
-#' #     test_id = results$test_ids,
-#' #     train_title = "Selected Polynomial in Train Cohort",
-#' #     test_title = "Selected Polynomial in Test Cohort",
-#' #     keep_remove = TRUE,
-#' #     threshold = polynomial_data$threshold,
-#' #     threshold_linetype = "dashed",
-#' #     threshold_line_color = "#5f6a7a",
-#' #     annotate_floor_thresh = TRUE,
-#' #     legend_position = "bottom"
-#' #   )
 #'
-#' # plots
+#' # implement polynomial is typically run before plotting (for identifying threshold)
+#' poly_out <-
+#' implement_polynomial(
+#'   data = longpoly_example_data,
+#'   order = 3,
+#'   floor_effects = TRUE,
+#'   floor_range = c(min(longpoly_example_data$performance_mean), 0)
+#' )
 #'
+#'   plot_polynomial(
+#' data = poly_out$final_data,
+#' order = 3,
+#' whole_cohort_title = "Selected Polynomial in Whole Cohort",
+#' whole_cohort_only = FALSE,
+#' train_id = test_results$train_ids,
+#' test_id = test_results$test_ids,
+#' train_title = "Selected Polynomial in Train Cohort",
+#' test_title = "Selected Polynomial in Test Cohort",
+#' keep_remove = TRUE,
+#' threshold = poly_out$threshold,
+#' threshold_linetype = "dashed",
+#' threshold_line_color = "#5f6a7a",
+#' annotate_floor_thresh = TRUE,
+#' legend_position = "bottom",
+#' )
+
+
 
 plot_polynomial <- function(data,
                             order = 3,

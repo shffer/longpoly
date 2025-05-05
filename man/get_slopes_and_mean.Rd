@@ -12,7 +12,7 @@ get_slopes_and_mean(
 )
 }
 \arguments{
-\item{data}{a longitudinal dataset}
+\item{data}{a longitudinal data set}
 
 \item{id_col}{the column name corresponding to the ID variable in data. Default = \code{"id"}}
 
@@ -27,7 +27,23 @@ a \code{tibble} with \code{id}, \code{performance_slope}, and \code{performance_
 Get individual linear slope and mean values from longitudinal data
 }
 \examples{
+# Create dummy data
+n_participants = 5
+n_timepoints = 3
 
-# get_slopes_and_mean(example_data, id_col = "id", outcome_col = "memory_test", time_col = "time")
+set.seed(2222)
 
+dummy <- data.frame(
+  id = rep(1:n_participants, each = n_timepoints),
+  timepoint = rep(1:n_timepoints, times = n_participants),
+  performance = rnorm(n_participants * n_timepoints, mean = 0, sd = 1)
+)
+
+# Extract slopes and mean from dummy data
+get_slopes_and_mean(
+data = dummy,
+id_col = "id",
+time_col = "timepoint",
+outcome_col = "performance"
+)
 }

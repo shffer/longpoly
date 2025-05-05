@@ -30,5 +30,16 @@ a dataset containing slope and mean values with sparse data removed (if requeste
 Filter slope and mean data to remove scarce data ranges before fitting polynomial
 }
 \examples{
-# example
+
+longpoly_example_data \%>\% nrow
+
+filtered_example_data <- filter_slopes_and_mean(
+data = longpoly_example_data,
+window_size = 0.25,
+min_obs = 20,
+max_filter = TRUE,
+min_filter = TRUE
+)
+
+filtered_example_data \%>\% nrow
 }

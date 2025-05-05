@@ -1,6 +1,6 @@
 #' Get individual linear slope and mean values from longitudinal data
 #'
-#' @param data a longitudinal dataset
+#' @param data a longitudinal data set
 #' @param id_col the column name corresponding to the ID variable in data. Default = `"id"`
 #' @param outcome_col the column name corresponding to the outcome variable in data. Default = `"outcome"`
 #' @param time_col the column name corresponding to the time variable in data. Default = `"time"`
@@ -10,9 +10,26 @@
 #' @import magrittr
 #' @import dplyr
 #' @examples
+#' # Create dummy data
+#' n_participants = 5
+#' n_timepoints = 3
 #'
-#' # get_slopes_and_mean(example_data, id_col = "id", outcome_col = "memory_test", time_col = "time")
+#' set.seed(2222)
 #'
+#' dummy <- data.frame(
+#'   id = rep(1:n_participants, each = n_timepoints),
+#'   timepoint = rep(1:n_timepoints, times = n_participants),
+#'   performance = rnorm(n_participants * n_timepoints, mean = 0, sd = 1)
+#' )
+#'
+#' # Extract slopes and mean from dummy data
+#' get_slopes_and_mean(
+#' data = dummy,
+#' id_col = "id",
+#' time_col = "timepoint",
+#' outcome_col = "performance"
+#' )
+
 
 get_slopes_and_mean <-
   function(data,
