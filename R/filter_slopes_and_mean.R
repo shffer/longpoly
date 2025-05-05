@@ -31,8 +31,12 @@ filter_slopes_and_mean <-
            max_filter = TRUE,
            min_filter = TRUE) {
 
+    if (window_size < 0) {
+      stop("Error: window_size must be non-negative.")
+    }
+
     mean <- "performance_mean"
-    window_size <- abs(window_size)
+
     max_cutoff <-  max(data[[mean]])
     min_cutoff <-  min(data[[mean]])
 
