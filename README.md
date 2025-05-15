@@ -397,18 +397,9 @@ plots <-
   )
 
 plots
-#> Warning: Computation failed in `stat_regline_equation()`.
-#> Caused by error:
-#> ! object 'performance_slope' not found
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="60%" height="60%" /><img src="README_files/figure-gfm/unnamed-chunk-10-2.png" width="60%" height="60%" /><img src="README_files/figure-gfm/unnamed-chunk-10-3.png" width="60%" height="60%" />
-
-    #> Warning: Computation failed in `stat_regline_equation()`.
-    #> Caused by error:
-    #> ! object 'performance_slope' not found
-
-<img src="README_files/figure-gfm/unnamed-chunk-10-4.png" width="60%" height="60%" />
+<img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="60%" height="60%" /><img src="README_files/figure-gfm/unnamed-chunk-10-2.png" width="60%" height="60%" /><img src="README_files/figure-gfm/unnamed-chunk-10-3.png" width="60%" height="60%" /><img src="README_files/figure-gfm/unnamed-chunk-10-4.png" width="60%" height="60%" />
 
 ### 5. Data Filtering
 
@@ -523,9 +514,6 @@ plots_filtered <-
   )
 
 plots_filtered$keep_remove
-#> Warning: Computation failed in `stat_regline_equation()`.
-#> Caused by error:
-#> ! object 'performance_slope' not found
 ```
 
 <img src="README_files/figure-gfm/unnamed-chunk-14-1.png" width="60%" height="60%" />

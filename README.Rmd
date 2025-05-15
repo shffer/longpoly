@@ -305,4 +305,3 @@ poly_out_filtered$final_data %>%
   select(id, residual) %>% 
   head(n = 10)
 ```
-
