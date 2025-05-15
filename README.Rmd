@@ -35,11 +35,11 @@ devtools::install_github("shffer/longpoly")
 
 ## Example
 
-Note, the below example workflow uses mean performance as the level of performance. This is the default for all longpoly functions. If baseline is preferred, add `performance_metric = "baseline"` to all function calls. 
+Note, the below example workflow uses mean performance as the performance metric. This is the default for all longpoly functions. If baseline is preferred, add `performance_metric = "baseline"` to all function calls. 
 
 ### 1. Get Slopes and Performance
 
-The first step in the workflow is to submit a longitudinal data set to `get_slopes_and_performance()`. This function returns a tibble with columns for "id", "performance_slope", and one of either "performance_mean" or "performance_baseline" depending on the user selection (by specificing `performance_metric` = "mean" or "baseline"). For the purposes of this example, I will create a dummy dataset of five participants, each with three timepoints.
+The first step in the workflow is to submit a longitudinal data set to `get_slopes_and_performance()`. This function returns a tibble with columns for "id", "performance_slope", and one of either "performance_mean" or "performance_baseline" depending on the user selection (by specificing `performance_metric = "mean"` or `"baseline"`). For the purposes of this example, I will create a dummy dataset of five participants, each with three timepoints.
 
 ```{r}
 n_participants = 5

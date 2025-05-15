@@ -175,7 +175,7 @@ plot_polynomial <- function(data,
         aes_string(x = predictor, y = outcome),
         label.x.npc = 0,
         label.y.npc = 0,
-        formula = as.formula(paste(outcome, "~ poly(", predictor, ",", order, ", raw=TRUE)")),
+        formula = y ~ poly(x, order, raw = TRUE),
         size = 3.5
       )
   }
