@@ -9,19 +9,21 @@
 Longpoly provides a suite of tools to analyse longitudinal data. These
 are intended to be applied in instances where expected rates of change
 may vary across performance levels. The motivating use case for longpoly
-was to investigate how average rates of cognitive decline depend on mean
-performance, but its utility extends to longitudinal data for other
-outcomes where similar relationships may be observed.
+was to investigate how average rates of cognitive decline depend on
+level of impairment, but its utility extends to longitudinal data for
+other outcomes where similar relationships may be observed.
 
 This approach provides a novel “performance-adjusted” measure of rates
-of change. Linear slopes are fit over an individual’s longitudinal
-observations, and their mean score is calculated. Next, a polynomial is
-fit at the group level to predict rates of change as a function of mean
-score. A polynomial here allows for this relationship to be non-linear,
+of change. Either mean performance or baseline performance can be used
+for this adjustment. Linear slopes are fit over an individual’s
+longitudinal observations, and their performance metric is calculated
+(i.e., mean or baseline). Next, a polynomial is fit at the group level
+to predict rates of change as a function of the chosen performance
+metric. A polynomial here allows for this relationship to be non-linear,
 and longpoly provides tools to select the polynomial order. **Finally,
 the residuals from this model are extracted as a measure of the extent
 to which an individual’s rate of change is faster or slower *than is
-typical for their mean level of performance*.**
+typical for their level of performance*.**
 
 In the case of cognitive decline, this approach also offers a
 data-driven method to identify floor effects. Floor effects occur when
@@ -29,16 +31,16 @@ cognitive assessments lack sensitivity to provide accurate measurements
 of performance in lower ranges. For longitudinal data, this means that
 cognitive decline in this range also cannot be reliably quantified.
 After fitting a polynomial model, longpoly can solve for the local
-minimum in the lower range of mean performance to identify the point
-where impaired performance becomes associated with slowed decline. While
-this is interpreted to reflect the range of performance where floor
-effects occur, it may alternatively reflect a true plateau in decline
-that occurs with advanced impairment. However, identifying this effect
-is also of interest as it is difficult to analyse rates of decline in
-participants in a plateau alongside those elsewhere on the spectrum of
-performance due to their fundamental differences. Longpoly can be used
-to filter out individuals with performance in the range for floor
-effects that it identifies.
+minimum in the lower range of mean/baseline performance to identify the
+point where impaired performance becomes associated with slowed decline.
+While this is interpreted to reflect the range of performance where
+floor effects occur, it may alternatively reflect a true plateau in
+decline that occurs with advanced impairment. However, identifying this
+effect is also of interest as it is difficult to analyse rates of
+decline in participants in a plateau alongside those elsewhere on the
+spectrum of performance due to their fundamental differences. Longpoly
+can be used to filter out individuals with performance in the range for
+floor effects that it identifies.
 
 ## Installation
 
@@ -52,13 +54,20 @@ devtools::install_github("shffer/longpoly")
 
 ## Example
 
-### 1. Get Slopes and Mean
+Note, the below example workflow uses mean performance as the level of
+performance. This is the default for all longpoly functions. If baseline
+is preferred, add `performance_metric = "baseline"` to all function
+calls.
+
+### 1. Get Slopes and Performance
 
 The first step in the workflow is to submit a longitudinal data set to
-`get_slopes_and_mean()`. This function returns a tibble with “id”,
-“performance_slope”, and “performance_mean” columns. For the purposes of
-this example, I will create a dummy dataset of five participants, each
-with three timepoints.
+`get_slopes_and_performance()`. This function returns a tibble with
+columns for “id”, “performance_slope”, and one of either
+“performance_mean” or “performance_baseline” depending on the user
+selection (by specificing `performance_metric` = “mean” or “baseline”).
+For the purposes of this example, I will create a dummy dataset of five
+participants, each with three timepoints.
 
 ``` r
 n_participants = 5
@@ -82,7 +91,7 @@ dummy |> head(n = 6)
 #> 6  2         3  -0.3150868
 ```
 
-This can now be used with `get_slopes_and_mean()`. Load longpoly
+This can now be used with `get_slopes_and_performance()`. Load longpoly
 
 ``` r
 library(longpoly)
@@ -91,7 +100,7 @@ library(longpoly)
 Apply the function (specifying the column names)
 
 ``` r
-sm <- get_slopes_and_mean(
+sm <- get_slopes_and_performance(
   data = dummy,
   id_col = "id",
   time_col = "timepoint",
@@ -111,13 +120,13 @@ sm
 
 #### A Note About Simulated Data
 
-The dummy data used for `get_slopes_and_mean()` did not simulate any
-relationship between mean and slope values and is therefore of limited
-use in illustrating the utility of the other functions in longpoly.
-Rather than using this output, the remainder of this example workflow
-makes use of the `longpoly_example_data` example cognitive data set that
-is shipped with longpoly. In creating this data, 1000 mean values
-($\bar{X}$) were initially sampled from $N(0, 1)$ (cognitively
+The dummy data used for `get_slopes_and_performance()` did not simulate
+any relationship between mean and slope values and is therefore of
+limited use in illustrating the utility of the other functions in
+longpoly. Rather than using this output, the remainder of this example
+workflow makes use of the `longpoly_example_data` example cognitive data
+set that is shipped with longpoly. In creating this data, 1000 mean
+values ($\bar{X}$) were initially sampled from $N(0, 1)$ (cognitively
 unimpaired participants) and another 1000 mean values were then sampled
 from $N(-1.5, 0.75)$ (participants with cognitive impairment). The data
 were combined and slopes ($Y$) were assigned conditionally as follows:
@@ -155,11 +164,12 @@ example_data |> head(n = 10)
 
 ### 2. Test Polynomials
 
-The tibble output from `get_slopes_and_mean()` (or the example data) can
-be used for testing models that describe the relationship between slope
-and mean values using `test_polynomial()`. This function assigns
-participants in to train and test data sets and fits polynomials up to a
-maximum order specified by the user. It returns a list containing:
+The tibble output from `get_slopes_and_performance()` (or the example
+data) can be used for testing models that describe the relationship
+between slope and mean values using `test_polynomial()`. This function
+assigns participants in to train and test data sets and fits polynomials
+up to a maximum order specified by the user. It returns a list
+containing:
 
 1.  ***polynomial_results*** - a tibble with columns recording the order
     of each polynomial tested with the corresponding proportion of
@@ -387,9 +397,18 @@ plots <-
   )
 
 plots
+#> Warning: Computation failed in `stat_regline_equation()`.
+#> Caused by error:
+#> ! object 'performance_slope' not found
 ```
 
-<img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="60%" height="60%" /><img src="README_files/figure-gfm/unnamed-chunk-10-2.png" width="60%" height="60%" /><img src="README_files/figure-gfm/unnamed-chunk-10-3.png" width="60%" height="60%" /><img src="README_files/figure-gfm/unnamed-chunk-10-4.png" width="60%" height="60%" />
+<img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="60%" height="60%" /><img src="README_files/figure-gfm/unnamed-chunk-10-2.png" width="60%" height="60%" /><img src="README_files/figure-gfm/unnamed-chunk-10-3.png" width="60%" height="60%" />
+
+    #> Warning: Computation failed in `stat_regline_equation()`.
+    #> Caused by error:
+    #> ! object 'performance_slope' not found
+
+<img src="README_files/figure-gfm/unnamed-chunk-10-4.png" width="60%" height="60%" />
 
 ### 5. Data Filtering
 
@@ -504,6 +523,9 @@ plots_filtered <-
   )
 
 plots_filtered$keep_remove
+#> Warning: Computation failed in `stat_regline_equation()`.
+#> Caused by error:
+#> ! object 'performance_slope' not found
 ```
 
 <img src="README_files/figure-gfm/unnamed-chunk-14-1.png" width="60%" height="60%" />
