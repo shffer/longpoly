@@ -17,3 +17,4 @@ Depends:
     R (>= 3.5)
 LazyData: true
 URL: https://shffer.github.io/longpoly/
+
