@@ -72,11 +72,11 @@
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
-<p>Note, the below example workflow uses mean performance as the level of performance. This is the default for all longpoly functions. If baseline is preferred, add <code>performance_metric = "baseline"</code> to all function calls.</p>
+<p>Note, the below example workflow uses mean performance as the performance metric. This is the default for all longpoly functions. If baseline is preferred, add <code>performance_metric = "baseline"</code> to all function calls.</p>
 <div class="section level3">
 <h3 id="id_1-get-slopes-and-performance">1. Get Slopes and Performance<a class="anchor" aria-label="anchor" href="#id_1-get-slopes-and-performance"></a>
 </h3>
-<p>The first step in the workflow is to submit a longitudinal data set to <code><a href="reference/get_slopes_and_performance.html">get_slopes_and_performance()</a></code>. This function returns a tibble with columns for “id”, “performance_slope”, and one of either “performance_mean” or “performance_baseline” depending on the user selection (by specificing <code>performance_metric</code> = “mean” or “baseline”). For the purposes of this example, I will create a dummy dataset of five participants, each with three timepoints.</p>
+<p>The first step in the workflow is to submit a longitudinal data set to <code><a href="reference/get_slopes_and_performance.html">get_slopes_and_performance()</a></code>. This function returns a tibble with columns for “id”, “performance_slope”, and one of either “performance_mean” or “performance_baseline” depending on the user selection (by specificing <code>performance_metric = "mean"</code> or <code>"baseline"</code>). For the purposes of this example, I will create a dummy dataset of five participants, each with three timepoints.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n_participants</span> <span class="op">=</span> <span class="fl">5</span></span>
 <span><span class="va">n_timepoints</span> <span class="op">=</span> <span class="fl">3</span></span>
