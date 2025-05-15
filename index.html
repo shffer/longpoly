@@ -75,7 +75,7 @@
 <div class="section level3">
 <h3 id="id_1-get-slopes-and-mean">1. Get Slopes and Mean<a class="anchor" aria-label="anchor" href="#id_1-get-slopes-and-mean"></a>
 </h3>
-<p>The first step in the workflow is to submit a longitudinal data set to <code><a href="reference/get_slopes_and_mean.html">get_slopes_and_mean()</a></code>. This function returns a tibble with “id”, “performance_slope”, and “performance_mean” columns. For the purposes of this example, I will create a dummy dataset of five participants, each with three timepoints.</p>
+<p>The first step in the workflow is to submit a longitudinal data set to <code>get_slopes_and_mean()</code>. This function returns a tibble with “id”, “performance_slope”, and “performance_mean” columns. For the purposes of this example, I will create a dummy dataset of five participants, each with three timepoints.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n_participants</span> <span class="op">=</span> <span class="fl">5</span></span>
 <span><span class="va">n_timepoints</span> <span class="op">=</span> <span class="fl">3</span></span>
@@ -96,12 +96,12 @@
 <span><span class="co">#&gt; 4  2         1   0.6963261</span></span>
 <span><span class="co">#&gt; 5  2         2   0.4622959</span></span>
 <span><span class="co">#&gt; 6  2         3  -0.3150868</span></span></code></pre></div>
-<p>This can now be used with <code><a href="reference/get_slopes_and_mean.html">get_slopes_and_mean()</a></code>. Load longpoly</p>
+<p>This can now be used with <code>get_slopes_and_mean()</code>. Load longpoly</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://shffer.github.io/longpoly/">longpoly</a></span><span class="op">)</span></span></code></pre></div>
 <p>Apply the function (specifying the column names)</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_slopes_and_mean.html">get_slopes_and_mean</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu">get_slopes_and_mean</span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">dummy</span>,</span>
 <span>  id_col <span class="op">=</span> <span class="st">"id"</span>,</span>
 <span>  time_col <span class="op">=</span> <span class="st">"timepoint"</span>,</span>
@@ -120,7 +120,7 @@
 <div class="section level4">
 <h4 id="a-note-about-simulated-data">A Note About Simulated Data<a class="anchor" aria-label="anchor" href="#a-note-about-simulated-data"></a>
 </h4>
-<p>The dummy data used for <code><a href="reference/get_slopes_and_mean.html">get_slopes_and_mean()</a></code> did not simulate any relationship between mean and slope values and is therefore of limited use in illustrating the utility of the other functions in longpoly. Rather than using this output, the remainder of this example workflow makes use of the <code>longpoly_example_data</code> example cognitive data set that is shipped with longpoly. In creating this data, 1000 mean values (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>X</mi><mo accent="true">‾</mo></mover><annotation encoding="application/x-tex">\bar{X}</annotation></semantics></math>) were initially sampled from <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(0, 1)</annotation></semantics></math> (cognitively unimpaired participants) and another 1000 mean values were then sampled from <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mn>1.5</mn><mo>,</mo><mn>0.75</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(-1.5, 0.75)</annotation></semantics></math> (participants with cognitive impairment). The data were combined and slopes (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Y</mi><annotation encoding="application/x-tex">Y</annotation></semantics></math>) were assigned conditionally as follows:</p>
+<p>The dummy data used for <code>get_slopes_and_mean()</code> did not simulate any relationship between mean and slope values and is therefore of limited use in illustrating the utility of the other functions in longpoly. Rather than using this output, the remainder of this example workflow makes use of the <code>longpoly_example_data</code> example cognitive data set that is shipped with longpoly. In creating this data, 1000 mean values (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>X</mi><mo accent="true">‾</mo></mover><annotation encoding="application/x-tex">\bar{X}</annotation></semantics></math>) were initially sampled from <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(0, 1)</annotation></semantics></math> (cognitively unimpaired participants) and another 1000 mean values were then sampled from <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mn>1.5</mn><mo>,</mo><mn>0.75</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(-1.5, 0.75)</annotation></semantics></math> (participants with cognitive impairment). The data were combined and slopes (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Y</mi><annotation encoding="application/x-tex">Y</annotation></semantics></math>) were assigned conditionally as follows:</p>
 <blockquote>
 <ul>
 <li>
@@ -163,7 +163,7 @@
 <div class="section level3">
 <h3 id="id_2-test-polynomials">2. Test Polynomials<a class="anchor" aria-label="anchor" href="#id_2-test-polynomials"></a>
 </h3>
-<p>The tibble output from <code><a href="reference/get_slopes_and_mean.html">get_slopes_and_mean()</a></code> (or the example data) can be used for testing models that describe the relationship between slope and mean values using <code><a href="reference/test_polynomial.html">test_polynomial()</a></code>. This function assigns participants in to train and test data sets and fits polynomials up to a maximum order specified by the user. It returns a list containing:</p>
+<p>The tibble output from <code>get_slopes_and_mean()</code> (or the example data) can be used for testing models that describe the relationship between slope and mean values using <code><a href="reference/test_polynomial.html">test_polynomial()</a></code>. This function assigns participants in to train and test data sets and fits polynomials up to a maximum order specified by the user. It returns a list containing:</p>
 <ol style="list-style-type: decimal">
 <li><p><strong><em>polynomial_results</em></strong> - a tibble with columns recording the order of each polynomial tested with the corresponding proportion of variance explained (PVE) in test and train data, as well as the additional PVE in the test data* for every increase in polynomial order</p></li>
 <li><p><strong><em>train_ids</em></strong> - a character vector of ids allocated to the train data set in model development</p></li>
