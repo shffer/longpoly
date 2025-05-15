@@ -309,22 +309,15 @@ PVE_{\text{test}} = \frac{SS_{\text{regression}}}{SS_{\text{total}}}
 <span>    legend_position <span class="op">=</span> <span class="st">"bottom"</span>,</span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="va">plots</span></span>
-<span><span class="co">#&gt; Warning: Computation failed in `stat_regline_equation()`.</span></span>
-<span><span class="co">#&gt; Caused by error:</span></span>
-<span><span class="co">#&gt; ! object 'performance_slope' not found</span></span></code></pre></div>
-<p><img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="60%" height="60%"><img src="README_files/figure-gfm/unnamed-chunk-10-2.png" width="60%" height="60%"><img src="README_files/figure-gfm/unnamed-chunk-10-3.png" width="60%" height="60%"></p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co">#&gt; Warning: Computation failed in `stat_regline_equation()`.</span></span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="co">#&gt; Caused by error:</span></span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="co">#&gt; ! object 'performance_slope' not found</span></span></code></pre></div>
-<p><img src="README_files/figure-gfm/unnamed-chunk-10-4.png" width="60%" height="60%"></p>
+<span><span class="va">plots</span></span></code></pre></div>
+<p><img src="README_files/figure-gfm/unnamed-chunk-10-1.png" width="60%" height="60%"><img src="README_files/figure-gfm/unnamed-chunk-10-2.png" width="60%" height="60%"><img src="README_files/figure-gfm/unnamed-chunk-10-3.png" width="60%" height="60%"><img src="README_files/figure-gfm/unnamed-chunk-10-4.png" width="60%" height="60%"></p>
 </div>
 <div class="section level3">
 <h3 id="id_5-data-filtering">5. Data Filtering<a class="anchor" aria-label="anchor" href="#id_5-data-filtering"></a>
 </h3>
 <p>Simulated data offers the benefit of knowing what our results <em>should</em> look like. We expected a third order polynomial with a floor effect when mean performance <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mo>−</mo><mn>1.5</mn></mrow><annotation encoding="application/x-tex">\approx -1.5</annotation></semantics></math>, as was seen. However, our final model also shows a prominent downward slope in its right tail that gives the impression that faster decline (more negative slopes) is expected when mean values exceed a value of approximately 2. This was not an effect that was simulated to exist – in fact, slopes were sampled from <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mn>0.10</mn><mo>,</mo><mn>0.2</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(-0.10, 0.2)</annotation></semantics></math> for all mean values <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≥</mo><mo>−</mo><mn>0.5</mn></mrow><annotation encoding="application/x-tex">\ge -0.5</annotation></semantics></math> meaning that the polynomial should be flat in this region to reflect the “true” effect.</p>
 <p>This observation reflects the (misleading) influence that scarce data points in the extremes of the distribution of mean performance can exert. Assessment of the whole cohort plot above suggests that, for data with mean performance &gt; 2, random sampling led to an over representation of more negative slopes. Review of the data in this range confirms this.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">performance_mean</span> <span class="op">&gt;</span> <span class="fl">2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">performance_slope</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">summary</span></span>
 <span><span class="co">#&gt;  performance_slope</span></span>
 <span><span class="co">#&gt;  Min.   :-0.4833  </span></span>
@@ -336,7 +329,7 @@ PVE_{\text{test}} = \frac{SS_{\text{regression}}}{SS_{\text{total}}}
 <p>If we sampled enough observations in this range, these summary statistics would instead reflect the distribution from which it was sampled. However, these mean values come from the Cognitively Unimpaired participants (see ‘A Note About Simulated Data’ above) and were sampled from <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(0,1)</annotation></semantics></math>. A score of 2 is therefore 2SD from the mean of its distribution and explains why data are scarce in this range.</p>
 <p>The function <code><a href="reference/filter_slopes_and_mean.html">filter_slopes_and_mean()</a></code> filters data in the extreme ranges for mean values according to user-defined criteria. A window reflecting the “width” of the extreme range is defined and a minimum number of observations for that range is defined. If the actual number of observations is less than the specified minimum, data in the window are removed. This can be performed on the left or right tails (or both), and if data points are removed from either, the polynomial fitting process (i.e., Steps 2 to 4) should be repeated.</p>
 <p>Since the values in the right tail in the example data were simulated from a separate distribution ( <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(0,1)</annotation></semantics></math> ) than those in the left ( <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mn>1.5</mn><mo>,</mo><mn>0.75</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(-1.5, 0.75)</annotation></semantics></math> ), I will perform filtering separately. For the right tail, I will set the window size to capture values above 2 (i.e., those more than 2SD above the distribution mean), and require at least 25 (out of 1000) observations in that range.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">filtered_example_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/filter_slopes_and_mean.html">filter_slopes_and_mean</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
 <span>  window_size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">performance_mean</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span>,</span>
@@ -348,7 +341,7 @@ PVE_{\text{test}} = \frac{SS_{\text{regression}}}{SS_{\text{total}}}
 <span><span class="co">#&gt; [1] "user defined miniumum number of observations:  25"</span></span>
 <span><span class="co">#&gt; [1] "data in max window removed"</span></span></code></pre></div>
 <p>I will now filter this data set for ranges in the left tail. For this, I will set the window size to capture any mean values less than - 3 (i.e., those more than 2SD below the distribution mean) and again require at least 25 observations.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">filtered_example_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/filter_slopes_and_mean.html">filter_slopes_and_mean</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">filtered_example_data</span>,</span>
 <span>  window_size <span class="op">=</span> <span class="op">-</span><span class="fl">3</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">filtered_example_data</span><span class="op">$</span><span class="va">performance_mean</span><span class="op">)</span>,</span>
@@ -360,7 +353,7 @@ PVE_{\text{test}} = \frac{SS_{\text{regression}}}{SS_{\text{total}}}
 <span><span class="co">#&gt; [1] "user defined miniumum number of observations:  25"</span></span>
 <span><span class="co">#&gt; [1] "data in min window not removed"</span></span></code></pre></div>
 <p>For brevity, I will skip the <code>test_polynomial</code> and <code>find_polynomial</code> steps and instead implement a third order polynomial and filter for floor effects (but in practice, the chosen development steps should not be skipped).</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">poly_out_filtered</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="fu"><a href="reference/implement_polynomial.html">implement_polynomial</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">filtered_example_data</span>,</span>
@@ -383,14 +376,11 @@ PVE_{\text{test}} = \frac{SS_{\text{regression}}}{SS_{\text{total}}}
 <span>    legend_position <span class="op">=</span> <span class="st">"bottom"</span>,</span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="va">plots_filtered</span><span class="op">$</span><span class="va">keep_remove</span></span>
-<span><span class="co">#&gt; Warning: Computation failed in `stat_regline_equation()`.</span></span>
-<span><span class="co">#&gt; Caused by error:</span></span>
-<span><span class="co">#&gt; ! object 'performance_slope' not found</span></span></code></pre></div>
+<span><span class="va">plots_filtered</span><span class="op">$</span><span class="va">keep_remove</span></span></code></pre></div>
 <p><img src="README_files/figure-gfm/unnamed-chunk-14-1.png" width="60%" height="60%"></p>
 <p>Based on our minimum count of 25 observations, the maximum range of mean scores was filtered (n = 22 with <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>X</mi><mo accent="true">‾</mo></mover><annotation encoding="application/x-tex">\bar{X}</annotation></semantics></math> &gt; 2) but not the minimum range (n = 37 with <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>X</mi><mo accent="true">‾</mo></mover><annotation encoding="application/x-tex">\bar{X}</annotation></semantics></math> &lt; -3). The identified threshold (now -1.6) did not change meaningfully from its previous value (i.e., -1.59), but the downward trend on the right tail is now less prominent.</p>
 <p>The residuals from this model can now be extracted from the participants above the floor effects threshold:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">poly_out_filtered</span><span class="op">$</span><span class="va">final_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">floor_effects</span> <span class="op">==</span> <span class="st">"keep"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">id</span>, <span class="va">residual</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
