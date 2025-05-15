@@ -6,6 +6,7 @@
 \usage{
 filter_slopes_and_mean(
   data,
+  performance_metric = "mean",
   window_size,
   min_obs,
   max_filter = TRUE,
@@ -13,7 +14,9 @@ filter_slopes_and_mean(
 )
 }
 \arguments{
-\item{data}{output from \code{longpoly::get_slopes_and_mean()} (or any tibble with columns "id", "performance_slope", & "performance_mean")}
+\item{data}{output from \code{longpoly::get_slopes_and_mean()} (or any tibble with columns "id", "performance_slope", & "performance_mean" or "performance_bl")}
+
+\item{performance_metric}{which measure of performance is being used? Must be either "mean" (in which case performance_mean column must be in data) or "baseline" (data must contain performance_bl). Default = \code{"mean"}}
 
 \item{window_size}{the difference added to /subtracted from the minuimum/maximum values to subset the data. The number of observations in this subset is counted}
 
@@ -35,6 +38,7 @@ longpoly_example_data \%>\% nrow
 
 filtered_example_data <- filter_slopes_and_mean(
 data = longpoly_example_data,
+performance_metric = "mean",
 window_size = 0.25,
 min_obs = 20,
 max_filter = TRUE,

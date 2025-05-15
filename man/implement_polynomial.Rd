@@ -6,13 +6,16 @@
 \usage{
 implement_polynomial(
   data,
+  performance_metric = "mean",
   order = 3,
   floor_effects = FALSE,
   floor_range = NULL
 )
 }
 \arguments{
-\item{data}{output from \code{longpoly::get_slopes_and_mean()} (or any tibble with columns "id", "performance_slope", & "performance_mean")}
+\item{data}{output from \code{longpoly::get_slopes_and_mean()} (or any tibble with columns "id", "performance_slope", & "performance_mean" or "performance_bl")}
+
+\item{performance_metric}{which measure of performance is being used? Must be either "mean" (in which case performance_mean column must be in data) or "baseline" (data must contain performance_bl). Default = \code{"mean"}}
 
 \item{order}{the order of the polynomial model (recommended to be selected on the scree plot output from \code{longpoly::test_polynomial()}). default = \code{3}}
 
@@ -24,7 +27,7 @@ implement_polynomial(
 a list containing:
 \enumerate{
 \item \code{model_formula} — the formula of the final model
-\item \code{final_data} — a tibble with columns for "id", "performance_slope", "performance_mean", "predicted_slope", and "residual." If \code{floor_effects = TRUE}, an additional column "floor_effects" is appended with either keep/remove reflecting whether the record should be removed based on the identified performance_mean threshold for floor effects
+\item \code{final_data} — a tibble with columns for "id", "performance_slope", either "performance_mean" or "performance_bl" (depending on \code{performance_metric}), "predicted_slope", and "residual." If \code{floor_effects = TRUE}, an additional column "floor_effects" is appended with either keep/remove reflecting whether the record should be removed based on the identified performance_mean threshold for floor effects
 \item \code{threshold} — if \code{floor_effects = TRUE}, this records the threshold used for floor effect classifications
 }
 }
@@ -36,6 +39,7 @@ Fit a polynomial of a specified order to describe the relationship between linea
 poly_out <-
 implement_polynomial(
   data = longpoly_example_data,
+  performance_metric = "mean",
   order = 3,
   floor_effects = TRUE,
   floor_range = c(min(longpoly_example_data$performance_mean), 0)

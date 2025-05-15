@@ -4,10 +4,19 @@
 \alias{find_polynomial}
 \title{A data-driven approach to choosing order of polynomial model describing the relationship between linear rate of change and mean score in longitudinal data}
 \usage{
-find_polynomial(data, test_proportion = 1/3, idcol = "id", max_order = 6, x)
+find_polynomial(
+  data,
+  performance_metric = "mean",
+  test_proportion = 1/3,
+  idcol = "id",
+  max_order = 6,
+  x
+)
 }
 \arguments{
-\item{data}{output from \code{longpoly::get_slopes_and_mean()} (or any tibble with columns "id", "performance_slope", & "performance_mean")}
+\item{data}{output from \code{longpoly::get_slopes_and_mean()} (or any tibble with columns "id", "performance_slope", & "performance_mean" or "performance_bl")}
+
+\item{performance_metric}{which measure of performance is being used? Must be either "mean" (in which case performance_mean column must be in data) or "baseline" (data must contain performance_bl). Default = \code{"mean"}}
 
 \item{test_proportion}{the proportion of participants to allocate to the test set. default = \code{1/3}}
 
@@ -31,7 +40,12 @@ a list containing:
 A data-driven approach to choosing order of polynomial model describing the relationship between linear rate of change and mean score in longitudinal data
 }
 \examples{
-find_poly_results <- find_polynomial(data = longpoly_example_data, test_proportion = 1/3, max_order = 6, x = 0.05)
+find_poly_results <- find_polynomial(data = longpoly_example_data,
+                                     performance_metric = "mean",
+                                     idcol = "id",
+                                     test_proportion = 1/3,
+                                     max_order = 6,
+                                     x = 0.05)
 
 # View proportion of variance explained in the train and test data for each polynomial tested
 find_poly_results$polynomial_results

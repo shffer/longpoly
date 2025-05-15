@@ -6,8 +6,9 @@
 \usage{
 plot_polynomial(
   data,
+  performance_metric = "mean",
   order = 3,
-  x_label = "Mean Performance",
+  x_label = "Performance Metric",
   y_label = "Slope",
   line_width = 1.5,
   point_size = 3.5,
@@ -44,6 +45,8 @@ plot_polynomial(
 }
 \arguments{
 \item{data}{the \code{final_data} tibble output from the \code{longpoly::implement_polynomial()}}
+
+\item{performance_metric}{which measure of performance is being used? Must be either "mean" (in which case performance_mean column must be in data) or "baseline" (data must contain performance_bl). Default = \code{"mean"}}
 
 \item{order}{the order of the polynomial model (recommended to be selected on the scree plot output from \code{longpoly::test_polynomial()}). default = \code{3}}
 

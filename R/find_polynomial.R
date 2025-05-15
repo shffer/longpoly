@@ -1,6 +1,7 @@
 #' A data-driven approach to choosing order of polynomial model describing the relationship between linear rate of change and mean score in longitudinal data
 #'
-#' @param data output from `longpoly::get_slopes_and_mean()` (or any tibble with columns "id", "performance_slope", & "performance_mean")
+#' @param data output from `longpoly::get_slopes_and_mean()` (or any tibble with columns "id", "performance_slope", & "performance_mean" or "performance_bl")
+#' @param performance_metric which measure of performance is being used? Must be either "mean" (in which case performance_mean column must be in data) or "baseline" (data must contain performance_bl). Default = `"mean"`
 #' @param test_proportion the proportion of participants to allocate to the test set. default = `1/3`
 #' @param idcol the column name corresponding to the ID variable in data. Default = `"id"`
 #' @param max_order the maximum order for polynomial models to be tested. Polynomial models for 1:`max_order` will be tested. default = `6`
@@ -15,7 +16,12 @@
 #' @export
 #'
 #' @examples
-#' find_poly_results <- find_polynomial(data = longpoly_example_data, test_proportion = 1/3, max_order = 6, x = 0.05)
+#' find_poly_results <- find_polynomial(data = longpoly_example_data,
+#'                                      performance_metric = "mean",
+#'                                      idcol = "id",
+#'                                      test_proportion = 1/3,
+#'                                      max_order = 6,
+#'                                      x = 0.05)
 #'
 #' # View proportion of variance explained in the train and test data for each polynomial tested
 #' find_poly_results$polynomial_results
@@ -30,11 +36,19 @@
 #' find_poly_results$train_ids |> head()
 #' find_poly_results$test_ids |> head()
 
-find_polynomial <- function(data, test_proportion = 1/3, idcol = "id", max_order = 6, x) {
+find_polynomial <- function(data,
+                            performance_metric = "mean",
+                            test_proportion = 1/3,
+                            idcol = "id",
+                            max_order = 6, x) {
 
-  # column names (get_slopes_and_mean() output)
+  # column names (get_slopes_and_performance() output)
+  if (!performance_metric %in% c("mean", "baseline")) {
+    stop("performance_metric must be either \"mean\" or \"baseline\"")
+  }
+
   outcome <- "performance_slope"
-  predictor <- "performance_mean"
+  predictor <- ifelse(performance_metric == "mean", "performance_mean", "performance_bl")
 
   # train and test
   unique_ids <- unique(data[[idcol]])

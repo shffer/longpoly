@@ -2,7 +2,7 @@
 
 export(filter_slopes_and_mean)
 export(find_polynomial)
-export(get_slopes_and_mean)
+export(get_slopes_and_performance)
 export(implement_polynomial)
 export(plot_polynomial)
 export(test_polynomial)

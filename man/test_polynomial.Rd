@@ -4,12 +4,22 @@
 \alias{test_polynomial}
 \title{Test models with polynomials of differing orders to describe the relationship between linear rate of change and mean score in longitudinal data}
 \usage{
-test_polynomial(data, test_proportion = 1/3, max_order = 6)
+test_polynomial(
+  data,
+  performance_metric = "mean",
+  test_proportion = 1/3,
+  idcol = "id",
+  max_order = 6
+)
 }
 \arguments{
-\item{data}{output from \code{longpoly::get_slopes_and_mean()} (or any tibble with columns "id", "performance_slope", & "performance_mean")}
+\item{data}{output from \code{longpoly::get_slopes_and_mean()} (or any tibble with columns "id", "performance_slope", & "performance_mean" or "performance_bl")}
+
+\item{performance_metric}{which measure of performance is being used? Must be either "mean" (in which case performance_mean column must be in data) or "baseline" (data must contain performance_bl). Default = \code{"mean"}}
 
 \item{test_proportion}{the proportion of participants to allocate to the test set. default = \code{1/3}}
+
+\item{idcol}{the column name corresponding to the ID variable in data. Default = \code{"id"}}
 
 \item{max_order}{the maximum order for polynomial models to be tested. Polynomial models for 1:\code{max_order} will be tested. default = \code{6}}
 }
@@ -27,7 +37,11 @@ Test models with polynomials of differing orders to describe the relationship be
 }
 \examples{
 
-test_results <- test_polynomial(data = longpoly_example_data, test_proportion = 1/3, max_order = 6)
+test_results <- test_polynomial(data = longpoly_example_data,
+                                idcol = "id",
+                                performance_metric = "mean",
+                                test_proportion = 1/3,
+                                max_order = 6)
 
 # View proportion of variance explained in the train and test data for each polynomial tested
 test_results$polynomial_results

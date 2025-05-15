@@ -1,6 +1,7 @@
 #' Plot selected models from `final_data` tibble output from the `longpoly::implement_polynomial()` function
 #'
 #' @param data the `final_data` tibble output from the `longpoly::implement_polynomial()`
+#' @param performance_metric which measure of performance is being used? Must be either "mean" (in which case performance_mean column must be in data) or "baseline" (data must contain performance_bl). Default = `"mean"`
 #' @param order the order of the polynomial model (recommended to be selected on the scree plot output from `longpoly::test_polynomial()`). default = `3`
 #' @param x_label a character vector to optionally change the x axis label. default = "Mean Performance"
 #' @param y_label a character vector to optionally change the y axis label. default = "Slope"
@@ -81,8 +82,9 @@
 
 
 plot_polynomial <- function(data,
+                            performance_metric = "mean",
                             order = 3,
-                            x_label = "Mean Performance",
+                            x_label = "Performance Metric",
                             y_label = "Slope",
                             line_width = 1.5,
                             point_size = 3.5,
@@ -116,15 +118,25 @@ plot_polynomial <- function(data,
                             floor_keep_label = "Keep",
                             floor_remove_label = "Remove") {
 
+
+  # column names (get_slopes_and_performance() output)
+  if (!performance_metric %in% c("mean", "baseline")) {
+    stop("performance_metric must be either \"mean\" or \"baseline\"")
+  }
+
+  outcome <- "performance_slope"
+  predictor <- ifelse(performance_metric == "mean", "performance_mean", "performance_bl")
+
   # ensure 'floor_effects' is properly assigned as a factor in the tibble
   data <- data %>%
     mutate(floor_effects = factor(floor_effects, levels = unique(floor_effects)))
 
 
   # fit polynomial regression
-  poly_fit <-
-    lm(performance_slope ~ poly(performance_mean, order, raw = TRUE),
-       data = data)
+  formula <-
+    as.formula(paste(outcome," ~ poly(", predictor, ",", order, ", raw=TRUE)"))
+  poly_fit <- lm(formula, data = data)
+
   coeffs <- coef(poly_fit)
 
   # define function
@@ -139,7 +151,7 @@ plot_polynomial <- function(data,
   whole_cohort <-
     ggscatter(
       data,
-      x = "performance_mean",
+      x = predictor,
       y = "performance_slope",
       size = point_size,
       color = whole_cohort_point_color,
@@ -150,20 +162,20 @@ plot_polynomial <- function(data,
                   linewidth = line_width) +
     xlab(x_label) +
     ylab(y_label) +
-    ylim(min(data$performance_slope) - y_offset,
-         max(data$performance_slope) + y_offset) +
-    xlim(min(data$performance_mean) - x_offset,
-         max(data$performance_mean) + x_offset) +
+    ylim(min(data[[outcome]]) - y_offset,
+         max(data[[outcome]]) + y_offset) +
+    xlim(min(data[[predictor]]) - x_offset,
+         max(data[[predictor]]) + x_offset) +
     theme(plot.title = element_text(hjust = 0.5, size = title_text_size),
           axis.title = element_text(size = axis_text_size))
   # add equation if show_equation = TRUE
   if (show_equation) {
     whole_cohort <- whole_cohort +
       stat_regline_equation(
-        aes(x = performance_mean, y = performance_slope),
+        aes_string(x = predictor, y = outcome),
         label.x.npc = 0,
         label.y.npc = 0,
-        formula = y ~ poly(x, order, raw = TRUE),
+        formula = as.formula(paste(outcome, "~ poly(", predictor, ",", order, ", raw=TRUE)")),
         size = 3.5
       )
   }
@@ -182,7 +194,7 @@ plot_polynomial <- function(data,
     # generate function from train data
     train_coeffs <-
       coef(lm(
-        performance_slope ~ poly(performance_mean, order, raw = TRUE),
+        formula,
         data = train_data
       ))
     poly_fun_train <- function(x) {
@@ -206,7 +218,7 @@ plot_polynomial <- function(data,
     train_plot <-
       ggscatter(
         train_data,
-        x = "performance_mean",
+        x = predictor,
         y = "performance_slope",
         color = train_point_color,
         title = train_title,
@@ -219,8 +231,8 @@ plot_polynomial <- function(data,
       ylab(y_label) +
       ylim(min(data$performance_slope) - y_offset,
            max(data$performance_slope) + y_offset) +
-      xlim(min(data$performance_mean) - x_offset,
-           max(data$performance_mean) + x_offset) +
+      xlim(min(data[[predictor]]) - x_offset,
+           max(data[[predictor]]) + x_offset) +
       theme(plot.title = element_text(hjust = 0.5, size = title_text_size),
             axis.title = element_text(size = axis_text_size))
 
@@ -228,7 +240,7 @@ plot_polynomial <- function(data,
     test_plot <-
       ggscatter(
         test_data,
-        x = "performance_mean",
+        x = predictor,
         y = "performance_slope",
         color = test_point_color,
         title = test_title,
@@ -239,10 +251,10 @@ plot_polynomial <- function(data,
                     linewidth = line_width) +
       xlab(x_label) +
       ylab(y_label) +
-      ylim(min(data$performance_slope) - y_offset,
-           max(data$performance_slope) + y_offset) +
-      xlim(min(data$performance_mean) - x_offset,
-           max(data$performance_mean) + x_offset) +
+      ylim(min(data[[outcome]]) - y_offset,
+           max(data[[outcome]]) + y_offset) +
+      xlim(min(data[[predictor]]) - x_offset,
+           max(data[[predictor]]) + x_offset) +
       theme(plot.title = element_text(hjust = 0.5, size = title_text_size),
             axis.title = element_text(size = axis_text_size))
 
@@ -256,8 +268,8 @@ plot_polynomial <- function(data,
       train_plot <- train_plot +
         annotate(
           "text",
-          x = min(data$performance_mean) - x_offset,
-          y = min(data$performance_slope) - y_offset,
+          x = min(data[[predictor]]) - x_offset,
+          y = min(data[[outcome]]) - y_offset,
           label = train_equation,
           hjust = 0,
           size = 3.5
@@ -266,8 +278,8 @@ plot_polynomial <- function(data,
       test_plot <- test_plot +
         annotate(
           "text",
-          x = min(data$performance_mean) - x_offset,
-          y = min(data$performance_slope) - y_offset,
+          x = min(data[[predictor]]) - x_offset,
+          y = min(data[[outcome]]) - y_offset,
           label = train_equation,
           hjust = 0,
           size = 3.5
@@ -312,7 +324,7 @@ plot_polynomial <- function(data,
         annotate(
           "text",
           x = threshold,
-          y = max(data$performance_slope),
+          y = max(data[[outcome]]),
           label = paste0("x = ", round(threshold, 2)),
           hjust = -0.1,
           size = 4
