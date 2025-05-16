@@ -24,7 +24,7 @@
 #' @param threshold (required if `keep_remove = TRUE`) the threshold used to keep or remove records due to floor_effects (recommended to use `threshold` output from `long_poly::implement_polynomial()`)
 #' @param threshold_linetype ggplot linetype arguments to control type of line when `keep_remove = TRUE`. set to "blank" to remove line
 #' @param threshold_line_color optionally set color of threhold line when `keep_remove = TRUE`
-#' @param x_offset increase or decrease the x axis plotting region. this value is subtracted and added from the min and max values of performance_mean, respectively, to specify the plotting region in relation to the observed data. default = 0.25
+#' @param x_offset increase or decrease the x axis plotting region. this value is subtracted and added from the min and max values of performance_mean or performance_bl, respectively, to specify the plotting region in relation to the observed data. default = 0.25
 #' @param y_offset increase or decrease the y axis plotting region. this value is subtracted and added from the min and max values of performance_slope, respectively, to specify the plotting region in relation to the observed data. default = 0.35
 #' @param title_text_size ggplot title text size argument. default = `14`
 #' @param axis_text_size ggplot axis title text size argument. default = `12`
@@ -261,7 +261,7 @@ plot_polynomial <- function(data,
     # position the equation equally in both plots
     if (show_equation) {
       equation_x <-
-        min(data$performance_mean) + 0.05 * diff(range(data$performance_mean))
+        min(data[[predictor]]) + 0.05 * diff(range(data[[predictor]]))
       equation_y <-
         min(data$performance_slope) + 0.05 * diff(range(data$performance_slope))
 
@@ -293,8 +293,8 @@ plot_polynomial <- function(data,
 
   # keep/remove plot
   if (keep_remove) {
-    if (is.null(threshold)) {
-      stop("threshold must be provided when keep_remove = TRUE")
+    if (is.null(threshold) || is.na(threshold)) {
+      stop("threshold must be provided and cannot be NA when keep_remove = TRUE")
     }
 
     keep_remove_plot <- whole_cohort +
